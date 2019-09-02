@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="b4c7009b-3523-4b0b-9cf1-aa329ef7101f" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution>
+      <executable />
+    </execution>
+  </component>
+  <component name="FileEditorManager">
+    <leaf />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Vue Single File Component" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/_i18n/en-us/index.js" />
+        <option value="$PROJECT_DIR$/_i18n/es/index.js" />
+        <option value="$PROJECT_DIR$/_store/messages/state.js" />
+        <option value="$PROJECT_DIR$/_store/messages/getters.js" />
+        <option value="$PROJECT_DIR$/_store/messages/mutations.js" />
+        <option value="$PROJECT_DIR$/_store/messages/actions.js" />
+        <option value="$PROJECT_DIR$/_store/index.js" />
+        <option value="$PROJECT_DIR$/_i18n/es/layout.js" />
+        <option value="$PROJECT_DIR$/_i18n/en-us/layout.js" />
+        <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/_i18n/en-us/sidebar.js" />
+        <option value="$PROJECT_DIR$/_i18n/es/sidebar.js" />
+        <option value="$PROJECT_DIR$/_layouts/frontend/messages/index.vue" />
+        <option value="$PROJECT_DIR$/_components/admin/users/widgets/widgetUser.vue" />
+        <option value="$PROJECT_DIR$/_components/admin/users/widgets/widgetUsers.vue" />
+        <option value="$PROJECT_DIR$/_layouts/admin/messages/index.vue" />
+        <option value="$PROJECT_DIR$/_components/admin/messages/thread.vue" />
+        <option value="$PROJECT_DIR$/_config/apiRoutes.js" />
+        <option value="$PROJECT_DIR$/_config/backendPages.js" />
+        <option value="$PROJECT_DIR$/_config/frontendPages.js" />
+        <option value="$PROJECT_DIR$/_config/sidebar.js" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-1926" />
+    <option name="y" value="-313" />
+    <option name="width" value="1936" />
+    <option name="height" value="1040" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="qchat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="qchat" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="qchat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="qchat" type="462c0819:PsiDirectoryNode" />
+              <item name="_config" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="qchat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="qchat" type="462c0819:PsiDirectoryNode" />
+              <item name="_layouts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="qchat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="qchat" type="462c0819:PsiDirectoryNode" />
+              <item name="_layouts" type="462c0819:PsiDirectoryNode" />
+              <item name="admin" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope">
+        <subPane subId="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope">
+          <expand>
+            <path>
+              <item name="qchat" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="C:\Users\Imagina\Documents\project-intranet\node_modules\@imagina\qchat" type="442cc68d:ScopeViewTreeModel$RootNode" />
+            </path>
+            <path>
+              <item name="qchat" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="C:\Users\Imagina\Documents\project-intranet\node_modules\@imagina\qchat" type="442cc68d:ScopeViewTreeModel$RootNode" />
+              <item name=".idea" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="two.files.diff.last.used.folder" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b4c7009b-3523-4b0b-9cf1-aa329ef7101f" name="Default Changelist" comment="" />
+      <created>1564785820834</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1564785820834</updated>
+      <workItem from="1564785821934" duration="3505000" />
+      <workItem from="1564844127688" duration="12592000" />
+      <workItem from="1565013363211" duration="8543000" />
+      <workItem from="1565099510936" duration="6432000" />
+      <workItem from="1565272288142" duration="1833000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="32905000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-1928" y="-321" width="1936" height="1056" extended-state="6" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26066098" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" order="8" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Terminal" order="10" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/_services/index.js" />
+    <entry file="file://$PROJECT_DIR$/_store/messages/state.js" />
+    <entry file="file://$PROJECT_DIR$/_store/messages/actions.js" />
+    <entry file="file://$PROJECT_DIR$/_store/messages/getters.js" />
+    <entry file="file://$PROJECT_DIR$/_store/messages/mutations.js" />
+    <entry file="file://$PROJECT_DIR$/_store/index.js" />
+    <entry file="file://$PROJECT_DIR$/_store/messages/index.js" />
+    <entry file="file://$PROJECT_DIR$/_i18n/es/index.js" />
+    <entry file="file://$PROJECT_DIR$/_i18n/en-us/layout.js" />
+    <entry file="file://$PROJECT_DIR$/_i18n/es/layout.js" />
+    <entry file="file://$PROJECT_DIR$/package.json" />
+    <entry file="file://$PROJECT_DIR$/README.md" />
+    <entry file="file://$PROJECT_DIR$/_i18n/en-us/index.js" />
+    <entry file="file://$PROJECT_DIR$/_i18n/en-us/sidebar.js" />
+    <entry file="file://$PROJECT_DIR$/_i18n/es/sidebar.js" />
+    <entry file="file://$PROJECT_DIR$/_layouts/frontend/messages/index.vue" />
+    <entry file="file://$PROJECT_DIR$/_components/admin/users/widgets/widgetUsers.vue" />
+    <entry file="file://$PROJECT_DIR$/_layouts/admin/messages/index.vue" />
+    <entry file="file://$PROJECT_DIR$/_components/admin/messages/thread.vue" />
+    <entry file="file://$PROJECT_DIR$/_config/apiRoutes.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_config/backendPages.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_config/frontendPages.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_config/sidebar.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+  </component>
+</project>
