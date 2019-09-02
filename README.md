@@ -1,4 +1,4 @@
-## QCHAT  | 1.0.0
+## QCHAT  | 1.0.0 💬
 
 ## Installation
 
