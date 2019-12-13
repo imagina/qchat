@@ -1,110 +1,159 @@
 <template>
   <q-dialog
-    maximized
-    no-backdrop-dismiss
-    v-model="open">
-    <q-card class="relative-position q-pt-lg">
-      <q-header>
-        <q-toolbar class="bg-primary text-white absolute-top">
-          <q-btn
-              @click="$emit('closeModal')"
-              flat
-              color="white"
-              flat
-              dense
-              v-close-popup
-              icon="arrow_left"
-          />
-          <q-toolbar-title>
-            Contactos
-          </q-toolbar-title>
-          <q-input dark borderless v-model="filter.search" input-class="text-right" class="q-ml-md" @input="getUsers">
-            <template v-slot:append>
-              <q-icon v-if="filter.search === ''" name="search" />
-              <q-icon v-else name="clear" class="cursor-pointer" @click="filter.search= ''" />
-            </template>
-          </q-input>
-        </q-toolbar>
-      </q-header>
-      <div class="q-pa-lg">
-        <div class="row q-gutter-sm">
-          <div class="col-md-12 q-mt-lg">
-            <q-list>
-              <q-item clickable v-ripple v-for="(user,index) in users" :key="index" @click="selectUser(user)" v-if="user">
-                <q-item-section avatar>
-                  <q-avatar>
-                    <img :src="getUrlImg(user.mainImage)" />
-                  </q-avatar>
-                </q-item-section>
-                <q-item-section>{{ user.fullName }}</q-item-section>
-              </q-item>
-            </q-list>
-          </div>
-        </div>
-      </div>
-    </q-card>
-  </q-dialog>
+  :content-css="{minWidth: '50vw'}"
+  no-backdrop-dismiss
+  no-esc-dismiss
+  v-model="open">
+  <q-card style="width: 300px" class="q-px-sm q-pb-md">
+
+    <q-btn
+    @click="$emit('closeModal')"
+    flat
+    style="position: absolute; top: 5px;right: 5px;"
+    color="primary"
+    round
+    dense
+    icon="cancel"/>
+    <div>
+      <div class="row">
+        <div class="col-md-12 q-mt-lg">
+          <q-field
+          :error="$v.form.userId.$error"
+          :error-label="$tr('ui.message.fieldRequired')"
+          class="q-mx-sm q-mt-sm" >
+          <q-select
+          filter
+          label="To"
+          v-model="form.userId"
+          :options="users"/>
+        </q-field>
+        <q-field
+        :error="$v.form.body.$error"
+        :error-label="$tr('ui.message.fieldRequired')"
+        class="q-mx-sm">
+        <q-input
+        rows="7"
+        label="Message"
+        type="textarea"
+        v-model="form.body"/>
+      </q-field>
+      <q-field class="q-mx-sm q-mb-sm" >
+        <q-btn
+        color="primary"
+        icon="send"
+        @click="initconversation()"
+        :label="$tr('ui.label.create')"
+        class="float-right"/>
+      </q-field>
+    </div>
+  </div>
+</div>
+
+</q-card>
+</q-dialog>
 </template>
 
 <script>
-  import { required } from 'vuelidate/lib/validators'
-  export default {
-    props:{
-      open:{
-        type: Boolean,
-        default: false
-      }
-    },
-    data () {
-      return{
-        users: [],
-        filter:{
-          search: ''
-        }
-      }
-    },
-    mounted() {
-      this.getUsers()
-    },
-    methods : {
-      getUrlImg(uri){
-        if(uri.lastIndexOf('http')>-1) {
-          return uri
-        }else{
-          return `${config('apiRoutes.api.base_url')}/${uri}`
-        }
-      },
-      getUsers(){
-        let params = {
-          params: {
-            include: 'fields,conversationsusers',
-            filter: this.filter
-          }
-        }
-        this.$crud.index('apiRoutes.quser.users', params)
-        .then( response => {
-          let userId = this.$store.state.quserAuth.userId
-          this.users = response.data.map(item => {
-            if(userId===item.id){
-              return false
-            }
-            return {
-              fullName: item.fullName,
-              id: item.id,
-              mainImage: item.mainImage,
-              conversationsusers: item.conversationsusers
-            }
-          })
-        })
-        .catch( error => {
-          console.warn( error )
-        })
-      },
-      selectUser(user){
-        this.$emit('select',user)
+import { required } from 'vuelidate/lib/validators'
+export default {
+  props:{
+    open:{
+      type: Boolean,
+      default: false
+    }
+  },
+  data () {
+    return{
+      users: [],
+      form:{
+        body: '',
+        userId: '',
+        conversationId:''
       }
     }
+  },
+  validations: {
+    form: {
+      body: { required },
+      userId: { required }
+    }
+  },
+  watch:{
+    open: function () {
+      this.form.body = ''
+      this.form.userId = ''
+    }
+  },
+  created () {
+    this.getUsers()
+  },
+  methods : {
+    getUsers(){
+      let params = {
+        params: {}
+      }
+      this.$crud.index('apiRoutes.quser.users', params)
+      .then( response => {
+        this.users = response.data.map(item => {
+          return {
+            label: item.fullName,
+            value: item.id
+          }
+        })
+      })
+      .catch( error => {
+        console.warn( error )
+      })
+    },
+    async initconversation () {
+      this.$v.form.$touch()
+      if (this.$v.form.$error) {
+        this.$alert.error({message: this.$tr('ui.message.formInvalid'), pos: 'bottom'})
+        return
+      }
+      let conversation = await this.createConversation()
+
+      let messageData = {
+        userId: this.$store.state.quserAuth.userId,
+        body: this.form.body,
+        conversationId: conversation.id
+      }
+      await this.createMessage(messageData)
+      this.$router.push({
+        name: 'qchat.admin.conversation.show',
+        params: {
+          id: conversation.id
+        }
+      })
+      this.$emit('closeModal')
+      this.$emit('updateConversations')
+    },
+    async createConversation(){
+      let res
+      let form = {
+        users: [
+          this.$store.state.quserAuth.userId,
+          this.form.userId
+        ]
+      }
+      await this.$crud.create('apiRoutes.qchat.conversations',form)
+      .then( response => {
+        res = response.data
+      })
+      .catch( error => {
+        res = null
+      })
+      return res
+    },
+    async createMessage(data){
+      this.$crud.create('apiRoutes.qchat.messages',data)
+      .then( response => {
+        return response.data
+      })
+      .catch( error => {})
+    },
   }
+}
 </script>
 
 <style scoped>
