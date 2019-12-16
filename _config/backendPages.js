@@ -9,6 +9,7 @@ export default {
 		layout: () => import('src/layouts/master'),
 		title: 'qchat.sidebar.adminMessages',
 		icon: 'far fa-comments',
+    authenticated: true
 	},
   conversation:{
     permission: null,
@@ -19,5 +20,7 @@ export default {
     layout: () => import('src/layouts/master'),
     title: 'qchat.sidebar.adminMessages',
     icon: 'far fa-comments',
+    authenticated: true
   },
+ 
 }

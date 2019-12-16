@@ -49,6 +49,7 @@ export default {
     warnAddOpt : 'Para agregar opciones, primero debe crear el producto',
     noOptions : 'No hay opciones agregadas',
     noDeleteOption : 'No puede borrar está opción, es padre de {name}',
-    selectProduct : 'Seleccione una opción de producto'
+    selectProduct : 'Seleccione una opción de producto',
+    notFoundConversations: 'No se han encontrado conversaciones!! ',
   }
 }

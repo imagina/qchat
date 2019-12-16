@@ -49,6 +49,7 @@ export default {
     warnAddOpt : 'To add options, you must first create the product',
     noOptions : 'There are no added options',
     noDeleteOption : 'You can not delete this option, you are the father of {name}',
-    selectProduct : 'Select a product option'
+    selectProduct : 'Select a product option',
+    notFoundConversations: 'Conversations not found ...',
   }
 }

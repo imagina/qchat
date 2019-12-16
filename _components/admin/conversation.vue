@@ -56,9 +56,10 @@
       </q-toolbar>
       <div class="row q-mx-md q-my-md" style="min-height: 790px">
         <div class="col-md-12">
+
           <not-found
             class="absolute-center"
-            label=" "
+            :label="$tr('qchat.layout.message.notFoundConversations')"
             :showButton="false"/>
         </div>
       </div>
