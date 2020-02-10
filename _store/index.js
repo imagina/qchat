@@ -1,4 +1,5 @@
-import conversation from '@imagina/qchat/_store/conversation/index'
+import master from '@imagina/qchat/_store/master/index'
+
 export default {
-  conversation: conversation,
+  master,
 }
