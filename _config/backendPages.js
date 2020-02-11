@@ -1,12 +1,11 @@
-
 export default {
   messages: {
 		permission: 'ichat.messages.index',
 		activated: true,
-		path: '/chat/messages',
+		path: '/chat',
 		name: 'qchat.admin.messages.index',
-    page: () => import('@imagina/qchat/_layouts/admin/messages/index'),
-		layout: () => import('src/layouts/master'),
+    page: () => import('@imagina/qchat/_pages/admin/index'),
+    layout: () => import('@imagina/qsite/_layouts/master.vue'),
 		title: 'qchat.sidebar.adminMessages',
 		icon: 'far fa-comments',
     authenticated: true
@@ -16,11 +15,11 @@ export default {
     activated: true,
     path: '/chat/conversation/:id',
     name: 'qchat.admin.conversation.show',
-    page: () => import('@imagina/qchat/_layouts/admin/messages/index'),
-    layout: () => import('src/layouts/master'),
+    page: () => import('@imagina/qchat/_pages/admin/index'),
+    layout: () => import('@imagina/qsite/_layouts/master.vue'),
     title: 'qchat.sidebar.adminMessages',
     icon: 'far fa-comments',
     authenticated: true
   },
- 
+
 }
