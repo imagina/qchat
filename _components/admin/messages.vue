@@ -39,7 +39,8 @@
   import message from '@imagina/qchat/_components/admin/message'
   import newMessage from '@imagina/qchat/_components/admin/newMessage'
   import InfiniteLoading from 'vue-infinite-loading'
-  
+  import Pusher from 'pusher-js'
+
   export default {
     components:{
       message,
@@ -58,31 +59,28 @@
         page: 1,
         take: 20,
         lastPage: 1,
+        pusher: null,
       }
     },
     watch:{
-      '$route.params.id': function (val) {
-        this.messages = []
-        this.page = 1
-        this.showInfiniteLoading = false
-        setTimeout( () => {
-          this.showInfiniteLoading = true
-        }, 500)
+      '$route.params.id': async function (val) {
+        this.init()
       }
     },
-    mounted(){
+    created(){
       this.$nextTick(() => {
-        this.showInfiniteLoading = false
-        this.messages = []
-        this.page = 1
-        setTimeout( () => {
-          this.showInfiniteLoading = true
-        }, 5000)
+        this.init()
       })
     },
     methods:{
+      init(){
+        this.connetPusher()
+        this.messages = []
+        this.page = 1
+        this.showInfiniteLoading = false
+        setTimeout( () => this.showInfiniteLoading = true , 500)
+      },
       infiniteHandler($state){
-
         let params = {
           refresh: true,
           params: {
@@ -107,7 +105,6 @@
           }
         });
       },
-
       sendNewMessage(event){
         this.animateScroll()
         /* Add new message to array messages */
@@ -119,7 +116,7 @@
         let newMessage = {
           body: event.body,
           userId: this.$store.state.quserAuth.userId,
-          conversationId: this.$route.params.id
+          conversationId: this.conversationId //this.$route.params.id
         }
         /* Send message to server */
         this.$crud.create('apiRoutes.qchat.messages', newMessage).then( response => {
@@ -130,15 +127,47 @@
           element.color = 'red-3'
         })
       },
-      
       animateScroll() {
         this.$refs.scrollArea.setScrollPosition(1000000000, 300)
+      },
+      async connetPusher(){
+        await this.disconnectPusher()
+        if ( !(this.conversationId == undefined) ) {
+          /* Disconnet pusher if it has a instance */
+          let key = env('PUSHER_APP_KEY')
+          let config = {
+            cluster:  env('PUSHER_APP_CLUSTER')
+          }
+          /* Init instance pusher */
+          this.pusher = new Pusher(key, config)
+          /* Suscribe pusher to global event */
+          this.pusher.subscribe('global')
+          let event = `conversation_${this.conversationId}`
+          /* listen event conversation_:id */
+          this.pusher.bind(event, ({data}) => {
+            /* handler event when is received a new message */
+            this.newMessagePusher(data)
+          })
+          /* Show debugging message */
+          console.log(`[APP] Connecting pusher`)
+        }
+      },
+      newMessagePusher( message ){
+        if( message.userId != this.$store.state.quserAuth.userData.id ){
+          /* if user that send the new message not is equal
+          to user in session, the new message is concated to end the messages array */
+          this.messages.push(message)
+          this.animateScroll()
+        }
+      },
+      disconnectPusher () {
+        if(this.pusher !== null ){
+          /* Disconnect pusher */
+          this.pusher.disconnect()
+          /* Show debugging message */
+          console.log(`[APP] Disconnecting pusher`)
+        }
       }
-      
     }
   }
 </script>
-
-<style scoped>
-
-</style>

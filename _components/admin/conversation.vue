@@ -13,7 +13,8 @@
         </q-item-section>
       </q-item>
       <div class="col-xs-12">
-        <messages :conversationId="conversationId"/>
+        <messages
+          :conversationId="conversationId"/>
       </div>
     </div>
   </div>
@@ -29,7 +30,7 @@
     props:{
       conversationId:{
         type: String,
-      }
+      },
     },
     data () {
       return {
