@@ -1,5 +1,7 @@
 # QCHAT  | 1.0.1 💬
 
+Quasar version required 1.9, for earlier versions or 0.17 use version 1.0.0 of this package.
+
 ## Imagina Colombia
 
 ### Installation
