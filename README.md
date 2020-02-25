@@ -6,6 +6,20 @@
 
 `` npm i @imagina/qchat@1.0.1 ``
 
+### Configuration 
+In you .env file add follow lines and replace data [pusher](https://pusher.com/)
+
+```dotenv
+# Pusher keys
+PUSHER_ACTIVE=true
+BROADCAST_DRIVER=pusher
+PUSHER_APP_ENCRYPTED=true
+PUSHER_APP_ID="your_pusher_id"
+PUSHER_APP_KEY="your_pusher_app_key"
+PUSHER_APP_SECRET="your_pusher_app_secret"
+PUSHER_APP_CLUSTER="your_pusher_app_cluster"
+```
+
 ### API Routes
 
 | ENTITY  | ROUTE |
