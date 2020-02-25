@@ -1,10 +1,12 @@
-## QCHAT  | 1.0.0 💬
+# QCHAT  | 1.0.1 💬
 
-## Installation
+## Imagina Colombia
 
-`` npm i @imagina/qchat@1.0.0 ``
+### Installation
 
-## API Routes
+`` npm i @imagina/qchat@1.0.1 ``
+
+### API Routes
 
 | ENTITY  | ROUTE |
 | ------------- | ------------- |
@@ -14,24 +16,50 @@
 | users  | apiRoutes.qchat.users |
 
 
-## Pages
-- ### Front-End
-
-   | PAGE | NAME |
-   | ------------- | ------------- |
+### Pages
   
-- ### Back-End
+- #### Back-End
 
-   | PAGE | NAME |
-   | ------------- | ------------- |
-   | messages | qchat.admin.messages.index|
-   | conversation | qchat.admin.conversation.show |
+   | PAGE | NAME | PATH |
+   | ------------- | ------------- | ------------- |
+   | messages | qchat.admin.messages.index | /chat |
+   | conversation | qchat.admin.conversation.show | /chat/conversation/:id |
   
-## Components  
+### Components  
 
   | NAME | ROUTE |
   | ------------- | ------------- |
   | conversation | @imagina/qchat/_components/admin/conversation |
-  | labelConversation |  @imagina/qchat/_components/admin/labelConversation |
-  | myConversations |  @imagina/qchat/_components/admin/myConversations |
-  | newConversation |  @imagina/qchat/_components/admin/newConversation |
+  | conversations | @imagina/qchat/_components/admin/conversations |
+  | conversationLabel | @imagina/qchat/_components/admin/conversationLabel |
+  | message | @imagina/qchat/_components/admin/message |
+  | messages | @imagina/qchat/_components/admin/messages |
+  | newMessage | @imagina/qchat/_components/admin/newMessage |
+  
+  If you need only a conversation with a specific user, you can use __conversations component__, this component waits for __conversationId__ as a parameter.
+  
+  Example:
+  
+  html
+  ```html
+  <template>
+     <conversation :conversationId="conversationId"/>
+  </template> 
+  ```
+  script
+  ```js
+  import conversation from '@imagina/qchat/_components/admin/conversation'
+  export default {
+    components:{
+      conversation
+    },
+    data () {
+      return {
+        conversationId: 1
+      }
+    }
+  }
+  ```
+  
+  
+  

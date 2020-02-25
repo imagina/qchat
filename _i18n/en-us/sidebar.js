@@ -1,3 +1,3 @@
 export default {
-  adminMessages : 'Messages',
+  adminMessages : 'Messenger',
 }

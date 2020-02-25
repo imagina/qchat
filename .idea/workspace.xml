@@ -1,7 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b4c7009b-3523-4b0b-9cf1-aa329ef7101f" name="Default Changelist" comment="" />
+    <list default="true" id="b4c7009b-3523-4b0b-9cf1-aa329ef7101f" name="Default Changelist" comment="Merge branch 'qv1'&#10;&#10;# Conflicts:&#10;#&#9;README.md&#10;#&#9;_components/admin/conversation.vue&#10;#&#9;_config/backendPages.js&#10;#&#9;_config/frontendPages.js&#10;#&#9;_i18n/en-us/layout.js&#10;#&#9;_i18n/en-us/sidebar.js&#10;#&#9;_i18n/es/layout.js&#10;#&#9;_i18n/es/sidebar.js&#10;#&#9;_store/index.js&#10;#&#9;package.json">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_components/admin/conversations.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_components/admin/conversationsLabel.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_components/admin/message.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_components/admin/messages.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_components/admin/newMessage.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_components/common/skeletonChat.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_components/common/skeletonList.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_pages/admin/index.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_store/master/actions.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_store/master/getters.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_store/master/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_store/master/mutations.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_store/master/state.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_components/admin/conversation.vue" beforeDir="false" afterPath="$PROJECT_DIR$/_components/admin/conversation.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_config/backendPages.js" beforeDir="false" afterPath="$PROJECT_DIR$/_config/backendPages.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_config/frontendPages.js" beforeDir="false" afterPath="$PROJECT_DIR$/_config/frontendPages.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_i18n/en-us/layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/_i18n/en-us/layout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_i18n/en-us/sidebar.js" beforeDir="false" afterPath="$PROJECT_DIR$/_i18n/en-us/sidebar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_i18n/es/layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/_i18n/es/layout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_i18n/es/sidebar.js" beforeDir="false" afterPath="$PROJECT_DIR$/_i18n/es/sidebar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_store/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/_store/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,7 +40,15 @@
     </execution>
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/_components/admin/conversation.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1092" />
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -23,6 +57,18 @@
         <option value="JavaScript File" />
       </list>
     </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="qv1" />
+      </map>
+    </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/_i18n/es/layout.js" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/_components/admin/conversation.vue" root0="SKIP_INSPECTION" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -53,43 +99,16 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-1926" />
-    <option name="y" value="-313" />
-    <option name="width" value="1936" />
-    <option name="height" value="1040" />
+    <option name="x" value="240" />
+    <option name="y" value="131" />
+    <option name="width" value="1440" />
+    <option name="height" value="788" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="qchat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="qchat" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="qchat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="qchat" type="462c0819:PsiDirectoryNode" />
-              <item name="_config" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="qchat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="qchat" type="462c0819:PsiDirectoryNode" />
-              <item name="_layouts" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="qchat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="qchat" type="462c0819:PsiDirectoryNode" />
-              <item name="_layouts" type="462c0819:PsiDirectoryNode" />
-              <item name="admin" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
       <pane id="Scope">
         <subPane subId="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope">
           <expand>
@@ -106,9 +125,32 @@
           <select />
         </subPane>
       </pane>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="qchat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="qchat" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="qchat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="qchat" type="462c0819:PsiDirectoryNode" />
+              <item name="_components" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="qchat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="qchat" type="462c0819:PsiDirectoryNode" />
+              <item name="_components" type="462c0819:PsiDirectoryNode" />
+              <item name="admin" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -147,12 +189,12 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="32905000" />
+    <option name="totallyTimeSpent" value="33433000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1928" y="-321" width="1936" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26066098" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2771855" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -164,7 +206,7 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Version Control" order="9" weight="0.3296582" />
       <window_info anchor="bottom" id="Terminal" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -175,6 +217,38 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/_services/index.js" />
@@ -207,6 +281,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/_config/sidebar.js">
       <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_components/admin/conversation.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1092" />
+      </provider>
     </entry>
   </component>
 </project>
