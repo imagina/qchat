@@ -149,7 +149,7 @@
             this.newMessagePusher(data)
           })
           /* Show debugging message */
-          console.log(`[APP] Connecting pusher`)
+          console.log(`[APP] Connecting pusher M`)
         }
       },
       newMessagePusher( message ){
@@ -165,7 +165,7 @@
           /* Disconnect pusher */
           this.pusher.disconnect()
           /* Show debugging message */
-          console.log(`[APP] Disconnecting pusher`)
+          console.log(`[APP] Disconnecting pusher M`)
         }
       }
     }
