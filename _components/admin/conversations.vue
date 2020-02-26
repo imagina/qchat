@@ -72,6 +72,7 @@
   import conversationsLabel from '@imagina/qchat/_components/admin/conversationsLabel'
   import skeletonList from '@imagina/qchat/_components/common/skeletonList'
   import InfiniteLoading from 'vue-infinite-loading'
+  import Pusher from 'pusher-js'
 
   export default {
     components:{
@@ -88,6 +89,7 @@
           take: 20
         },
         search: '',
+        pusher: null,
       }
     },
     computed: {
@@ -96,6 +98,11 @@
           return conversation.user.fullName.toLowerCase().includes(this.search.toLowerCase())
         })
       }
+    },
+    created() {
+      this.$nextTick(function () {
+        this.connetPusher()
+      })
     },
     methods:{
       infiniteHandler($state) {
@@ -131,6 +138,61 @@
           delete newUser.users
           return newUser
         })
+      },
+      async connetPusher(){
+        await this.disconnectPusher()
+        /* Disconnet pusher if it has a instance */
+        let key = env('PUSHER_APP_KEY')
+        let config = {
+          cluster:  env('PUSHER_APP_CLUSTER')
+        }
+        /* Init instance pusher */
+        this.pusher = new Pusher(key, config)
+        /* Suscribe pusher to global event */
+        this.pusher.subscribe('global')
+        let event = `conversationsUserUpdated${this.$store.state.quserAuth.userData.id}`
+        /* listen event conversation_:id */
+        this.pusher.bind(event, ({message}) => {
+          /* handler event when is received a new message */
+          this.updateConversationsPusher(message)
+        })
+        /* Show debugging message */
+        console.log(`[APP] Connecting pusher C`)
+      },
+      updateConversationsPusher(message){
+
+        if(this.$route.params.id == message.conversationId ||
+          message.userId == this.$store.state.quserAuth.userData.id){
+          return
+        }
+
+        /*{id: 220, type: "text", body: "60", conversationId: "2", userId: "1", …}
+        id: 220
+        type: "text"
+        body: "60"
+        conversationId: "2"
+        userId: "1"
+        user: {id: 1, firstName: "Imagina", lastName: "Colombia", fullName: "Imagina Colombia", activated: 1, …}
+        createdAt: "2020-02-26 14:52:52"}*/
+
+        let conversationIndex = this.conversations.indexOf(
+          this.conversations.find( conversation => (
+            conversation.id == message.conversationId
+          ))
+        )
+
+        this.conversations[conversationIndex].lastMessageReaded = message.id
+
+        console.warn(message)
+
+      },
+      disconnectPusher(){
+        if(this.pusher !== null ){
+          /* Disconnect pusher */
+          this.pusher.disconnect()
+          /* Show debugging message */
+          console.log(`[APP] Disconnecting pusher C`)
+        }
       }
     }
   }
