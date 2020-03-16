@@ -112,6 +112,7 @@
             filter: {
               myconversations: true
             },
+            include: 'conversationUsers',
             page: this.pagination.page,
             take: this.pagination.take,
           },
@@ -133,7 +134,8 @@
           let authUserId = this.$store.state.quserAuth.userId
           let newUser = {
             ...conversation,
-            user: conversation.users.find( user => user.id != authUserId)
+            user: conversation.users.find( user => user.id != authUserId),
+            conversationUsers: conversation.conversationUsers.find( user => user.userId == authUserId).id
           }
           delete newUser.users
           return newUser
@@ -157,7 +159,7 @@
           this.updateConversationsPusher(message)
         })
         /* Show debugging message */
-        console.log(`[APP] Connecting pusher C`)
+        console.log(`[APP] Connecting pusher Conversations`)
       },
       updateConversationsPusher(message){
 
@@ -191,7 +193,7 @@
           /* Disconnect pusher */
           this.pusher.disconnect()
           /* Show debugging message */
-          console.log(`[APP] Disconnecting pusher C`)
+          console.log(`[APP] Disconnecting pusher Conversations`)
         }
       }
     }
