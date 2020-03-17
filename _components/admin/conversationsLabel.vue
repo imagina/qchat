@@ -16,7 +16,13 @@
         </q-item-label>
       </q-item-section>
       <q-item-section avatar>
+        <q-spinner-ios
+          v-if="loading"
+          color="primary"
+          size="1em"
+        />
         <q-icon
+          v-else
           :color="`${conversation.lastMessageReaded ? 'primary' : 'grey-5'}`"
           name="fas fa-comment-dots">
           <q-badge
@@ -39,17 +45,47 @@
         default: () => {}
       },
     },
+    data (){
+      return {
+        loading: false
+      }
+    },
     computed:{
- 
+
     },
     methods:{
-      redirectToConversation(conversation){
-        this.$router.push({
+      async redirectToConversation(conversation){
+        await this.updateLastMessageReaded()
+        await this.$router.push({
           name: 'qchat.admin.conversation.show',
           params:{
             id: this.conversation.id
           }
         })
+      },
+      async updateLastMessageReaded(){
+        this.loading = true
+        /* If lastMessageReaded not is null, update to null */
+        if(this.conversation.lastMessageReaded != null ){
+          /* preparing data for update */
+          let criteria = this.conversation.conversationUsers
+          let data = {
+            lastMessageReaded: null
+          }
+          /* Send update */
+          await this.$crud.update('apiRoutes.qchat.conversationUser', criteria, data).then( response => {
+            console.log( response )
+            this.loading = false
+            /* Update to null in lastMessageReaded of this conversation */
+            this.conversation.lastMessageReaded = null
+          }).catch( error => {
+            console.error( error)
+            this.loading = false
+          })
+          /* Bug message */
+          console.warn('Updating last message readed ...')
+        }
+        this.loading = false
       }
     }
   }
