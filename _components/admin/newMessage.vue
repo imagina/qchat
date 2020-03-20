@@ -34,6 +34,7 @@
   import EmojiDataAnimalsNature from '@kevinfaguiar/vue-twemoji-picker/emoji-data/es/emoji-group-animals-nature.json';
   import EmojiDataFoodDrink from '@kevinfaguiar/vue-twemoji-picker/emoji-data/es/emoji-group-food-drink.json';
   import EmojiGroups from '@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json';
+  import moment from 'moment'
 
   export default {
     components: {
@@ -65,10 +66,12 @@
       },
       sendMessage(){
         if (this.message != ''){
+          let now = new Date()
+          let date = moment(now).format('YYYY-MM-DD hh:mm:ss')
           let data = {
             color: 'grey-5',
             userId: this.$store.state.quserAuth.userId,
-            createdAt: '2019-12-12 15:14:08',
+            createdAt: date,
             body: this.message,
             user: {
               mainImage: this.$store.state.quserAuth.userData.mainImage
@@ -101,6 +104,18 @@
   .emoji-popover-inner::-webkit-scrollbar-thumb, .scroll-min::-webkit-scrollbar-thumb
   {
     background-color: #bdbcbc;
+  }
+  
+  #btn-emoji{
+    transition: all .1s ease;
+    margin: 0;
+    margin-bottom: 8px;
+    -webkit-filter: grayscale(100%)
+  }
+  
+  #btn-emoji:hover{
+    transform: scale(1.2);
+    -webkit-filter: grayscale(0%)
   }
 
 </style>
