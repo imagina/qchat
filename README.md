@@ -6,7 +6,7 @@ Quasar version required 1.9, for earlier versions or 0.17 use version 1.0.0 of t
 
 ### Installation
 
-`` npm i @imagina/qchat@1.0.1 ``
+`` npm i @imagina/qchat ``
 
 ### Configuration 
 In you .env file add follow lines and replace data [pusher](https://pusher.com/)
