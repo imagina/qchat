@@ -11,7 +11,7 @@
         <q-item-section>{{this.$store.state.quserAuth.userData.fullName}}</q-item-section>
 
         <q-item-section side>
-          <newConversation/>
+          <usersContainer/>
         </q-item-section>
 
       </q-item>
@@ -78,14 +78,14 @@
   import skeletonList from '@imagina/qchat/_components/common/skeletonList'
   import InfiniteLoading from 'vue-infinite-loading'
   import Pusher from 'pusher-js'
-  import newConversation from '@imagina/qchat/_components/admin/newConversation'
+  import usersContainer from '@imagina/qchat/_components/admin/usersContainer'
 
   export default {
     components:{
       conversationsLabel,
       skeletonList,
       InfiniteLoading,
-      newConversation
+      usersContainer
     },
     data () {
       return {
