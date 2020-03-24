@@ -1,7 +1,7 @@
 <template>
   <div
     class="row bordered-x bordered-b">
-    <div class="col-xs-12 bg-grey-2 bordered-x bordered-t">
+    <div class="col-xs-12 bg-grey-2 bordered-x bordered-t relative-position">
       <q-item class="bordered-b">
         <q-item-section avatar class="q-pa-sm">
           <q-avatar>
@@ -9,6 +9,11 @@
           </q-avatar>
         </q-item-section>
         <q-item-section>{{this.$store.state.quserAuth.userData.fullName}}</q-item-section>
+
+        <q-item-section side>
+          <newConversation/>
+        </q-item-section>
+
       </q-item>
       <q-input
         rounded
@@ -73,12 +78,14 @@
   import skeletonList from '@imagina/qchat/_components/common/skeletonList'
   import InfiniteLoading from 'vue-infinite-loading'
   import Pusher from 'pusher-js'
+  import newConversation from '@imagina/qchat/_components/admin/newConversation'
 
   export default {
     components:{
       conversationsLabel,
       skeletonList,
-      InfiniteLoading
+      InfiniteLoading,
+      newConversation
     },
     data () {
       return {
