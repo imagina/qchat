@@ -1,3 +1,3 @@
 export default {
-  adminMessages : 'Mensajero',
+  adminMessages : 'Chat',
 }
