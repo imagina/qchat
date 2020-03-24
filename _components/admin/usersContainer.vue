@@ -12,10 +12,10 @@
       enter-active-class="animated fadeInLeft"
       leave-active-class="animated fadeOutLeft">
       <div
-        v-show="showPanelUsers"
+        v-if="showPanelUsers"
         class="absolute float-div bg-white">
-        <q-list>
-          <q-item-label header class="q-py-lg bg-primary text-white">
+        <q-toolbar class="bg-primary text-white shadow-1 q-py-lg">
+          <q-toolbar-title>
             <q-btn
               dense
               flat
@@ -23,8 +23,8 @@
               @click="showPanelUsers = !showPanelUsers"
               icon="keyboard_backspace"/>
             Nuevo Chat
-          </q-item-label>
-        </q-list>
+          </q-toolbar-title>
+        </q-toolbar>
         <q-scroll-area
           ref="scrollAreaUsers"
           style="height: 78vh">
@@ -32,17 +32,7 @@
             <div
               v-for="(user, index) in users"
               :key="index">
-              <q-item v-ripple class="q-ml-sm q-my-sm">
-                <q-item-section avatar>
-                  <q-avatar>
-                    <img :src="user.smallImage">
-                  </q-avatar>
-                </q-item-section>
-                <q-item-section>
-                  {{user.fullName}}
-                </q-item-section>
-              </q-item>
-              <q-separator />
+              <userLabel :user="user"/>
             </div>
           </q-list>
         </q-scroll-area>
@@ -52,11 +42,17 @@
 </template>
 
 <script>
+  import userLabel from '@imagina/qchat/_components/admin/userLabel'
+
   export default {
+    components:{
+      userLabel
+    },
     data () {
       return {
         showPanelUsers: false,
-        users: []
+        users: [],
+        currentUser: {},
       }
     },
     mounted() {
@@ -66,10 +62,13 @@
     },
     methods: {
       getUsers () {
-        this.$crud.index('apiRoutes.quser.users').then( response => {
+        this.$crud.index('apiRoutes.quser.users').then( response => (
           this.users = response.data
-        }).catch( error => (
-          this.$alert.error({message: this.$tr('ui.message.errorRequest'), pos: 'bottom'})
+        )).catch( error => (
+          this.$alert.error({
+            message: this.$tr('ui.message.errorRequest'),
+            pos: 'bottom'
+          })
         ))
       },
     }
