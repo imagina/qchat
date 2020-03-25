@@ -55,6 +55,13 @@
         currentUser: {},
       }
     },
+    created () {
+      this.$root.$on('newNewConversationMessage', this.handlerNewNewConversationMessage)
+    },
+    beforeDestroy () {
+     
+      this.$root.$off('newNewConversationMessage', this.handlerNewNewConversationMessage)
+    },
     mounted() {
       this.$nextTick( () => {
         this.getUsers()
@@ -71,6 +78,9 @@
           })
         ))
       },
+      handlerNewNewConversationMessage(event){
+        this.showPanelUsers = !this.showPanelUsers
+      }
     }
   }
 </script>
