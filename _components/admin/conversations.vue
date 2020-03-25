@@ -9,11 +9,9 @@
           </q-avatar>
         </q-item-section>
         <q-item-section>{{this.$store.state.quserAuth.userData.fullName}}</q-item-section>
-
         <q-item-section side>
           <usersContainer/>
         </q-item-section>
-
       </q-item>
       <q-input
         rounded
@@ -51,6 +49,7 @@
           </div>
         </q-list>
         <infinite-loading
+          ref="InfiniteLoading"
           class="q-pt-md"
           spinner="waveDots"
           @infinite="infiniteHandler">
@@ -202,6 +201,9 @@
           /* Show debugging message */
           console.log(`[APP] Disconnecting pusher Conversations`)
         }
+      },
+      refresh(){
+        this.$refs.InfiniteLoading.stateChanger.reset();
       }
     }
   }
