@@ -37,14 +37,19 @@
     methods:{
       async handlerClick(){
         if(this.message){
-          /* If not exist conversation, create a new */
-          let conversation = await this.getConversation()
+          let conversation = []
+           conversation = await this.getConversation()
           console.warn(conversation)
-          /* Send message to conversation */
-          // await this.sendMessage()
+          return
+          //  ----------
+          if (conversation.length == 0){
+            conversation = await this.createConversation()
+          }
+          await this.sendMessage(conversation)
         }
       },
       async getConversation(){
+        let conversation = {}
         let params = {
           refresh: true,
           params: {
@@ -57,9 +62,8 @@
           }
         }
         await this.$crud.index('apiRoutes.qchat.conversations', params).then( ({data}) => {
-          return data
+          conversation = data
         }).catch( error => {
-          return []
           this.$alert.error({
             message: this.$tr('ui.message.errorRequest'),
             pos: 'bottom'
@@ -69,16 +73,18 @@
       },
       async createConversation() {
         let form = {}
+        let conversation = {}
         await this.$crud.create('apiRoutes.qchat.conversations', form).then( ({data}) => {
-          return data
+          conversation = data
         }).catch( error => {
           this.$alert.error({
             message: this.$tr('ui.message.errorRequest'),
             pos: 'bottom'
           })
         })
+        return conversation
       },
-      async sendMessage(){
+      async sendMessage(conversation){
         let form = {}
         await this.$crud.create('apiRoutes.qchat.conversations', form).then( ({data}) => {
           this.message = ''
