@@ -47,9 +47,7 @@
           this.loading = true
           let conversation = {}
           conversation = await this.getConversation()
-          console.warn(conversation)
-          return
-          if (conversation.length == 0){
+          if (conversation == undefined){
             conversation = await this.createConversation()
           }
           await this.sendMessage(conversation)
@@ -70,7 +68,7 @@
           }
         }
         await this.$crud.index('apiRoutes.qchat.conversations', params).then( ({data}) => {
-          conversation = data
+          conversation = data[0]
         }).catch( error => {
           this.$alert.error({
             message: this.$tr('ui.message.errorRequest'),
