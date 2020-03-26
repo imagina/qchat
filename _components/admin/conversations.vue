@@ -172,20 +172,30 @@
         /* Show debugging message */
         console.log(`[APP] Connecting pusher Conversations`)
       },
-      updateConversationsPusher(message){
-
+      async updateConversationsPusher(message){
+        /* Refresh conversation */
+        await this.refresh()
+  
+        /* Is it in same conversations, it not change status in lastMessageReaded */
         if(this.$route.params.id == message.conversationId ||
           message.userId == this.$store.state.quserAuth.userData.id){
           return
         }
-
-        let conversationIndex = this.conversations.indexOf(
+        
+        /* Get conversation for update */
+        let conversation = this.conversations.find( item => (
+          item.id == message.conversationId
+        ))
+        
+        /* Update lastMessageReaded in convesation founded */
+        conversation.lastMessageReaded = message.id
+        
+        /*let conversationIndex = this.conversations.indexOf(
           this.conversations.find( conversation => (
             conversation.id == message.conversationId
           ))
         )
-
-        this.conversations[conversationIndex].lastMessageReaded = message.id
+        this.conversations[conversationIndex].lastMessageReaded = message.id*/
       },
       disconnectPusher(){
         if(this.pusher !== null ){
@@ -196,10 +206,13 @@
         }
       },
       handlerNewNewConversationMessage(event){
+        this.refresh()
+      },
+      refresh(){
         this.pagination.page = 1
         this.conversations = []
         this.$refs.InfiniteLoading.stateChanger.reset()
-      },
+      }
     }
   }
 </script>
