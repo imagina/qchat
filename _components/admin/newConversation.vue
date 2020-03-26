@@ -50,6 +50,7 @@
           if (conversation == undefined){
             conversation = await this.createConversation()
           }
+          this.conversation = conversation
           await this.sendMessage(conversation)
           this.loading = false
         }
