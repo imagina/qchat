@@ -1,8 +1,21 @@
 <template>
   <div
-    class="row bordered-x bordered-b">
-    <div class="col-xs-12 bordered-t ">
+    class="row bordered-x bordered-b ">
+    <div :class="`col-xs-12 bordered-t ${$q.platform.is.mobile ? 'bordered-l' : ''}`">
       <q-item class="bordered-b bg-grey-2">
+        
+        <q-item-section
+          v-if="$q.platform.is.mobile"
+          side >
+          <q-btn
+            @click="goBack"
+            flat
+            dense
+            round
+            icon="keyboard_arrow_left"
+          />
+        </q-item-section>
+        
         <q-item-section avatar class="q-pa-sm ">
           <q-avatar>
             <img :src="user ? user.mainImage : 'https://modulos.imaginacolombia.com/modules/iprofile/img/default.jpg'">
@@ -82,6 +95,11 @@
           this.loading = false
         })
       },
+      goBack(){
+        this.$router.push({
+          name: 'qchat.admin.messages.index'
+        })
+      }
     }
   }
 </script>
