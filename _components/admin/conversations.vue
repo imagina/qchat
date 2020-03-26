@@ -45,7 +45,8 @@
             <conversationsLabel
               v-for="(conversation, index) in conversationsFiltered"
               :key="index"
-              :conversation="conversation"/>
+              :conversation="conversation"
+            />
           </div>
         </q-list>
         <infinite-loading
@@ -105,7 +106,11 @@
         })
       }
     },
+    beforeDestroy () {
+      this.$root.$off('newNewConversationMessage', this.handlerNewNewConversationMessage)
+    },
     created() {
+      this.$root.$on('newNewConversationMessage', this.handlerNewNewConversationMessage)
       this.$nextTick(function () {
         this.connetPusher()
       })
@@ -174,15 +179,6 @@
           return
         }
 
-        /*{id: 220, type: "text", body: "60", conversationId: "2", userId: "1", …}
-        id: 220
-        type: "text"
-        body: "60"
-        conversationId: "2"
-        userId: "1"
-        user: {id: 1, firstName: "Imagina", lastName: "Colombia", fullName: "Imagina Colombia", activated: 1, …}
-        createdAt: "2020-02-26 14:52:52"}*/
-
         let conversationIndex = this.conversations.indexOf(
           this.conversations.find( conversation => (
             conversation.id == message.conversationId
@@ -190,9 +186,6 @@
         )
 
         this.conversations[conversationIndex].lastMessageReaded = message.id
-
-        console.warn(message)
-
       },
       disconnectPusher(){
         if(this.pusher !== null ){
@@ -202,9 +195,11 @@
           console.log(`[APP] Disconnecting pusher Conversations`)
         }
       },
-      refresh(){
-        this.$refs.InfiniteLoading.stateChanger.reset();
-      }
+      handlerNewNewConversationMessage(event){
+        this.pagination.page = 1
+        this.conversations = []
+        this.$refs.InfiniteLoading.stateChanger.reset()
+      },
     }
   }
 </script>
