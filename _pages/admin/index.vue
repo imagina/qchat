@@ -3,13 +3,17 @@
     <div class="col-xs-12">
       <q-card class="no-shadow">
         <q-card-section class="q-pa-none">
-          <div class="row ">
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-3">
+          <div class="row">
+            <div
+              class="col-xs-12 col-sm-6 col-md-6 col-lg-3"
+              v-if="($q.platform.is.mobile && !$route.params.id) || $q.platform.is.desktop" >
               <q-card class="no-shadow">
                 <conversations />
               </q-card>
             </div>
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-9 bordered-b bordered-r">
+            <div
+              class="col-xs-12 col-sm-6 col-md-6 col-lg-9 bordered-b bordered-r"
+              v-if="($q.platform.is.mobile && $route.params.id) || $q.platform.is.desktop" >
               <q-card class="no-shadow">
                 <conversation :conversationId="$route.params.id"/>
               </q-card>
