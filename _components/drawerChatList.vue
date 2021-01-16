@@ -234,7 +234,8 @@ export default {
             this.pushMessage(message)
           } else {//Set unread message
             let cIndex = this.conversations.list.findIndex(item => item.id == message.conversationId)
-            this.conversations.list[cIndex].unReadMessages = true
+            if (cIndex != -1) this.conversations.list[cIndex].unReadMessages = true
+            else this.getConversations(true)
           }
         }
       })
