@@ -96,14 +96,14 @@
             <!--Emoji picker-->
             <template v-slot:prepend>
               <twemoji-picker
-                :pickerWidth="320"
-                :pickerHeight="230"
-                @emojiUnicodeAdded="setEmoji"
-                :emojiData="emojiProps.data"
-                :emojiGroups="emojiProps.groups"
-                :recentEmojisFeat="false"
-                :skinsSelection="false"
-                searchEmojisFeat/>
+                  :pickerWidth="320"
+                  :pickerHeight="230"
+                  @emojiUnicodeAdded="setEmoji"
+                  :emojiData="emojiProps.data"
+                  :emojiGroups="emojiProps.groups"
+                  :recentEmojisFeat="false"
+                  :skinsSelection="false"
+                  searchEmojisFeat/>
             </template>
             <!--Send button-->
             <template v-slot:append>
@@ -266,7 +266,10 @@ export default {
       return new Promise((resolve, reject) => {
         this.conversations.loading = true
         //Request Params
-        let requestParams = {refresh: refresh}
+        let requestParams = {
+          refresh: refresh,
+          params: {include: 'users,lastMessage'}
+        }
 
         //Reques
         this.$crud.index('apiRoutes.qchat.conversations', requestParams).then(response => {
