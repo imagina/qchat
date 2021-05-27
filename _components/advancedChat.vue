@@ -1,13 +1,10 @@
 <template>
   <div id="advanceChatComponent">
     <div id="advanceChatComponentContent" class="relative-position">
-      Pagination : {{ chatPagination }}
-      | Messages Count {{ conversationMessages.length }}
-      | Message loaded : {{ chatProps.messagesLoaded }}
-      <q-separator class="q-my-md"/>
       <!--Chat component-->
       <chat-window id="vueAdvanceChat" v-bind="chatProps" @fetch-messages="getMessages" @send-message="sendMessage"
-                   @add-room="showModalSearchUser = true"/>
+                   @add-room="showModalSearchUser = true" @menu-action-handler="menuActionHandler"
+                   @open-file="({message}) => $helper.openExternalURL(message.file.url, true)"/>
       <!--Dialog to new room-->
       <q-dialog v-model="showModalSearchUser">
         <q-card id="showModalSearchUser" class="bg-grey-1">
@@ -42,8 +39,11 @@ export default {
     this.$eventBus.$off('inotification.chat.message')
   },
   props: {
+    accept: {default: '.pdf, .xlsx, .docx, .pptx, .mp4, .mp3, .jpg, image/*'},
     roomId: {default: false},
-    allowCreateChat: {default: false}
+    allowCreateChat: {default: false},
+    menuActions: {default: false},
+    height: {default: '600px'}
   },
   components: {ChatWindow},
   watch: {},
@@ -75,6 +75,19 @@ export default {
     }
   },
   computed: {
+    //Return accept files
+    acceptFiles() {
+      //Images
+      if (this.accept == 'images') return '.jpg, image/*'
+      //documents
+      if (this.accept == 'documents') return '.pdf, .xlsx, .docx, .pptx'
+      //Media
+      if (this.accept == 'media') return '.mp4, .mp3, .jpg, image/*'
+
+      //Default
+      let mediaConfig = this.$store.state.qsiteApp.configs.Media
+      return this.$clone(mediaConfig ? mediaConfig['allowed-types'] : this.accept)
+    },
     //Chat props
     chatProps() {
       return {
@@ -84,12 +97,16 @@ export default {
         roomsLoaded: !this.loading.rooms,
         messages: this.messages,
         loadingMessages: this.loading.messages,
+        showReactionEmojis: false,
         messagesLoaded: (this.chatPagination.page == this.chatPagination.lastPage) ? true : false,
         loadFirstRoom: false,
         singleRoom: this.roomId ? true : false,
         roomId: this.openRoomId,
         showAddRoom: this.allowCreateChat,
-        acceptedFiles: "image/png, image/jpeg, application/pdf"
+        messageActions: [{name: 'replyMessage', title: 'Reply'}],
+        acceptedFiles: this.acceptFiles,
+        height: this.height,
+        menuActions: this.menuActions || []
       }
     },
     //Rooms
@@ -102,21 +119,17 @@ export default {
 
       //Order room
       conversations.forEach(conversation => {
-        //Defina format date to last message
-        let diffDays = this.$moment().diff(this.$moment(conversation.updatedAt), 'days')
-        let timestampLastMessage = (diffDays <= 0) ? this.$trd(conversation.updatedAt, {type: 'time'}) :
-            (diffDays <= 7 ? this.$trd(conversation.updatedAt, {type: 'day'}) : this.$moment(conversation.updatedAt).format('MM/DD/YYYY'))
-
         //Instance roorm
         let room = {
           roomId: conversation.id,
           roomName: conversation.userConversation.fullName,
           avatar: conversation.userConversation.mainImage,
           unreadCount: conversation.unreadMessagesCount || false,
+          messageActions: false,
           lastMessage: !conversation.lastMessage ? false : {
-            content: conversation.lastMessage.body,
+            content: conversation.lastMessage.body || '',
             senderId: conversation.lastMessage.userId,
-            timestamp: timestampLastMessage
+            timestamp: this.$date.getHumanCalendar(conversation.updatedAt)
           },
           users: [
             {
@@ -142,25 +155,58 @@ export default {
     messages() {
       let messages = []//Response
       let conversationMessages = this.$clone(this.conversationMessages).reverse()
-
       //Order room
       conversationMessages.forEach(messageData => {
         if (!messages.find(message => message._id == messageData.id)) {
+          //Validate reply message
+          if (messageData.replyTo) {
+            messageData.replyMessage = {
+              _id: messageData.replyTo.id,
+              content: messageData.replyTo.body || '',
+              sender_id: messageData.replyTo.userId,
+              file: !messageData.replyTo.attachment ? false : {
+                name: messageData.replyTo.attachment.filename,
+                size: messageData.replyTo.attachment.filesize,
+                type: messageData.replyTo.attachment.mimetype,
+                extension: `.${messageData.replyTo.attachment.extension}`,
+                url: messageData.replyTo.attachment.path,
+                audio: messageData.replyTo.attachment.extension == 'mp3' ? true : false
+              }
+            }
+          }
+
+          //Validate attachment message
+          if (messageData.attachment) {
+            messageData.file = {
+              name: messageData.attachment.filename,
+              size: messageData.attachment.filesize,
+              type: messageData.attachment.mimetype,
+              extension: `.${messageData.attachment.extension}`,
+              url: messageData.attachment.path,
+              audio: messageData.attachment.extension == 'mp3' ? true : false
+            }
+          }
+
           //Instance message
           let message = {
             _id: messageData.id,
-            content: messageData.body,
+            content: messageData.body || '',
             senderId: messageData.user.id,
             username: messageData.user.fullName,
             avatar: messageData.user.mainImage,
             date: this.$trd(messageData.createdAt),
             timestamp: this.$trd(messageData.createdAt, {type: 'time'}),
-            seen: true
+            file: messageData.file || false,
+            replyMessage: messageData.replyMessage || false,
+            seen: true,
+            frontId: messageData.frontId || false
           }
+
           //Push room
           messages.push(message)
         }
       })
+
       //Response
       return this.$clone(messages)
     },
@@ -279,7 +325,7 @@ export default {
             page: (this.chatPagination.page + 1),
             take: this.chatPagination.perPage,
             filter: {conversationId: room.roomId},
-            include: 'user'
+            include: 'user,replyTo'
           }
         }
 
@@ -303,31 +349,79 @@ export default {
     },
     //Send message
     sendMessage({content, roomId, file, replyMessage}) {
-      return new Promise((resolve, reject) => {
-        if (content.length) {
-          //Request data
-          let requestData = {
-            conversationId: roomId,
-            body: content,
-            userId: this.$store.state.quserAuth.userId
-          }
-          //Request
-          this.$crud.create('apiRoutes.qchat.messages', requestData)
-          //push Message
-          this.pushMessage({body: content})
-        }
+      return new Promise(async (resolve, reject) => {
+        //Default message data
+        let messageData = {body: content, frontId: this.$uid()}
+
+        //Set file information to message
         if (file) {
-          let requestData = {
-            conversationId: roomId,
-            body: file,
-            userId: this.$store.state.quserAuth.userId
+          //Add file to message
+          messageData.file = {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            extension: `.${file.extension || file.type}`,
+            url: file.localUrl
           }
-          //Request
-          this.$crud.create('apiRoutes.qchat.messages', requestData)
-          //push Message
-          this.pushMessage({body: file})
+          //Add audio to message
+          if (file.audio) {
+            messageData.file.audio = true
+            messageData.file.duration = file.duration
+          }
         }
 
+        //Set reply id
+        if (replyMessage) {
+          messageData.replyMessage = replyMessage
+        }
+
+        //push Message
+        this.pushMessage(messageData)
+
+        //Request data to conversation message
+        let requestData = {
+          frontId: messageData.frontId,
+          conversationId: roomId,
+          body: content || '',
+          userId: this.$store.state.quserAuth.userId,
+          replyToId: replyMessage ? replyMessage._id : null
+        }
+
+        //Upload file to media
+        if (file) {
+          //Parse file
+          let fileBase64 = await this.$helper.getBase64(file.blob)
+          let fileObject = await this.$helper.urlToFile(
+              fileBase64,
+              file.audio ? file.name : `${file.name}.${file.extension}`,
+              file.type)
+
+          //Form Data
+          let fileData = new FormData()
+          fileData.append('parent_id', 0)
+          fileData.append('file', fileObject)
+          fileData.append('disk', 'privatemedia')
+
+          //Request send file
+          let fileMedia = await this.$crud.post('apiRoutes.qmedia.files', fileData)
+
+          //Add file id to message
+          if (fileMedia && fileMedia.data) {
+            requestData.mediasSingle = {attachment: fileMedia.data.id}
+            requestData.attached = fileMedia.data.id
+          }
+        }
+
+        //Request
+        this.$crud.create('apiRoutes.qchat.messages', requestData).then(response => {
+          //Search message by frontId
+          let messageIndex = this.conversationMessages.findIndex(item => item.frontId == response.data.frontId)
+          //Set db message id to local message
+          if (messageIndex != -1) {
+            this.conversationMessages[messageIndex].id = response.data.id
+            this.conversationMessages[messageIndex].attachment = response.data.attachment || false
+          }
+        })
       })
     },
     //Push new message
@@ -413,6 +507,10 @@ export default {
 
       })
     },
+    //Menu action handler
+    menuActionHandler({roomId, action}) {
+      if (action.action) action.action({roomId, action})
+    }
   }
 }
 </script>
