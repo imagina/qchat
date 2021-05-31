@@ -35,18 +35,29 @@ import 'vue-advanced-chat/dist/vue-advanced-chat.css'
 
 export default {
   beforeDestroy() {
-    this.$root.$off('page.data.refresh')
     this.$eventBus.$off('inotification.chat.message')
   },
   props: {
     accept: {default: '.pdf, .xlsx, .docx, .pptx, .mp4, .mp3, .jpg, image/*'},
     roomId: {default: false},
+    roomsId: {default: false},
     allowCreateChat: {default: false},
-    menuActions: {default: false},
-    height: {default: '600px'}
+    height: {default: '600px'},
+    advancedProps: {default: false},
+    loadRooms: {default: true}
   },
   components: {ChatWindow},
-  watch: {},
+  watch: {
+    roomId() {
+      this.getRooms()
+    },
+    roomsId() {
+      this.getRooms()
+    },
+    openRoomId(newValue) {
+      this.$emit('room-opened', newValue)
+    }
+  },
   mounted() {
     this.$nextTick(function () {
       this.init()
@@ -106,7 +117,8 @@ export default {
         messageActions: [{name: 'replyMessage', title: 'Reply'}],
         acceptedFiles: this.acceptFiles,
         height: this.height,
-        menuActions: this.menuActions || []
+        menuActions: [],
+        ...(this.advancedProps || {})
       }
     },
     //Rooms
@@ -236,10 +248,6 @@ export default {
     },
     //Listen pusher message
     listenEvents() {
-      //Refresh page
-      this.$root.$on('page.data.refresh', () => {
-        this.getRooms(true)
-      })
       //New message from pusher
       this.$eventBus.$on('inotification.chat.message', (response) => {
         if (response.data) this.pushMessage(response.data)
@@ -248,37 +256,42 @@ export default {
     //Get auth user rooms
     getRooms(refresh = false) {
       return new Promise((resolve, reject) => {
-        this.loading.rooms = true
-        this.openRoomId = null//Reset room selected
-        this.conversations = []//Reset conversation
-        this.conversationMessages = []//Reset conversation messages
+        if (this.loadRooms) {
+          this.loading.rooms = true
+          this.openRoomId = null//Reset room selected
+          this.conversations = []//Reset conversation
+          this.conversationMessages = []//Reset conversation messages
 
-        //Request Params
-        let requestParams = {
-          refresh: true,
-          params: {include: 'users,lastMessage,conversationUsers'}
-        }
+          //Request Params
+          let requestParams = {
+            refresh: true,
+            params: {
+              include: 'users,lastMessage,conversationUsers',
+              filter: {ids: this.roomsId}
+            }
+          }
 
-        //Request
-        if (this.roomId) {//Get only one room
-          this.$crud.show('apiRoutes.qchat.conversations', this.roomId, requestParams).then(response => {
-            this.orderConversationData([response.data])
-            this.openRoomId = this.conversations[0].id
-            this.loading.rooms = false // stop load Rooms
-            resolve(response.data)
-          }).catch(error => {
-            this.loading.rooms = false
-            resolve(error)
-          })
-        } else {//Get user auth rooms
-          this.$crud.index('apiRoutes.qchat.conversations', requestParams).then(response => {
-            this.orderConversationData(response.data)
-            this.loading.rooms = false
-            resolve(response.data)
-          }).catch(error => {
-            this.loading.rooms = false
-            resolve(error)
-          })
+          //Request
+          if (this.roomId) {//Get only one room
+            this.$crud.show('apiRoutes.qchat.conversations', this.roomId, requestParams).then(response => {
+              this.orderConversationData([response.data])
+              this.openRoomId = this.conversations[0].id
+              this.loading.rooms = false // stop load Rooms
+              resolve(response.data)
+            }).catch(error => {
+              this.loading.rooms = false
+              resolve(error)
+            })
+          } else {//Get user auth rooms
+            this.$crud.index('apiRoutes.qchat.conversations', requestParams).then(response => {
+              this.orderConversationData(response.data)
+              this.loading.rooms = false
+              resolve(response.data)
+            }).catch(error => {
+              this.loading.rooms = false
+              resolve(error)
+            })
+          }
         }
       })
     },
@@ -517,6 +530,9 @@ export default {
 <style lang="stylus">
 #advanceChatComponentContent
   #vueAdvanceChat
+    &.vac-card-window
+      box-shadow none
+
     .vac-room-list
       .vac-room-item
         min-height auto
