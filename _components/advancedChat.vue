@@ -480,6 +480,23 @@ export default {
       if (!message.conversation || (message.conversation.id == this.openRoomId)) {
         this.conversationMessages.unshift(messageData)
       }
+
+      //Play sound
+      this.playSound(message)
+    },
+    //Play sound message
+    playSound(message) {
+      //If room is close
+      if (message.conversation && (message.conversation.id != this.openRoomId)) {
+        this.$helper.playSound({
+          url: `${this.$store.state.qsiteApp.baseUrl}/modules/ichat/audio/sound_chat_notification.mp3`
+        })
+      } else if (message.userId && (message.userId != this.$store.state.quserAuth.userId)) {
+        this.$helper.playSound({
+          url: `${this.$store.state.qsiteApp.baseUrl}/modules/ichat/audio/sound_message_notification.mp3`,
+          volume: 0.2
+        })
+      }
     },
     //Create conversation
     createRoom(userId) {
