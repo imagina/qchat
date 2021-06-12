@@ -267,7 +267,7 @@ export default {
             refresh: true,
             params: {
               include: 'users,lastMessage,conversationUsers',
-              filter: {ids: this.roomsId}
+              filter: {ids: this.$clone(this.roomsId)}
             }
           }
 
