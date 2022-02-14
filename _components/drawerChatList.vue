@@ -3,7 +3,7 @@
     <!-- ===== Header ===== -->
     <div class="text-subtitle1 row items-center">
       <q-icon name="fas fa-comment-alt" color="primary" size="20px" class="q-mr-sm"/>
-      <label>{{ $tr('ui.label.chat', {capitalize: true}) }}</label>
+      <label>{{ $tr('isite.cms.label.chat', {capitalize: true}) }}</label>
     </div>
 
     <!--Separator-->
@@ -14,12 +14,12 @@
       <!--Search-->
       <q-select outlined dense v-model="search.userId" use-input hide-selected emit-value map-options
                 input-debounce="800" :options="search.userList" @filter="searchUsers"
-                :placeholder="`${$tr('ui.label.find')} ${$tr('ui.label.user')}...`"
+                :placeholder="`${$tr('isite.cms.label.find')} ${$tr('isite.cms.label.user')}...`"
                 @input="createConversation" style="width: 100%" class="q-mb-sm">
         <template v-slot:no-option>
           <q-item>
             <q-item-section class="text-grey">
-              {{ $tr('ui.message.searchNotFound') }}
+              {{ $tr('isite.cms.message.searchNotFound') }}
             </q-item-section>
           </q-item>
         </template>
@@ -80,7 +80,7 @@
             <div style="width: 100%" class="q-py-sm q-px-md">
               <!--Empty chat-->
               <div v-if="!chat.loading && !messageList.length" class="text-center text-grey-7 q-mt-md">
-                {{ $tr('qchat.layout.message.noMessages') }}
+                {{ $tr('ichat.cms.message.noMessages') }}
               </div>
               <!--Messages-->
               <q-chat-message v-for="(message, key) in messageList" :key="key" :sent="message.sent ? true : false"

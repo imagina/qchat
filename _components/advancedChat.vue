@@ -11,7 +11,7 @@
           <!--Header Modal-->
           <q-toolbar class="bg-primary text-white">
             <q-toolbar-title>
-              {{ this.$tr('ui.label.new') }} {{ this.$tr('ui.label.chat') }}
+              {{ this.$tr('isite.cms.label.new') }} {{ this.$tr('isite.cms.label.chat') }}
             </q-toolbar-title>
             <q-btn flat v-close-popup icon="fas fa-times"/>
           </q-toolbar>
@@ -507,7 +507,7 @@ export default {
         //validate user selected is not same to auth user
         if (userId == this.chatProps.currentUserId) {
           this.showModalSearchUser = false//close modal Create room
-          this.$alert.error(this.$tr('ui.message.errorRequest'))
+          this.$alert.error(this.$tr('isite.cms.message.errorRequest'))
           return reject(false)
         }
 
