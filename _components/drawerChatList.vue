@@ -1,9 +1,14 @@
 <template>
   <div id="drawerChatComponent" class="q-pa-md" v-if="$auth.hasAccess('ichat.conversations.index')">
     <!-- ===== Header ===== -->
-    <div class="text-subtitle1 row items-center">
-      <q-icon name="fas fa-comment-alt" color="primary" size="20px" class="q-mr-sm"/>
-      <label>{{ $tr('isite.cms.label.chat', {capitalize: true}) }}</label>
+    <div class="row justify-between items-center">
+      <div class="text-subtitle1 row items-center">
+        <q-icon name="fas fa-comment-alt" color="primary" size="20px" class="q-mr-sm"/>
+        <label>{{ $tr('isite.cms.label.chat', {capitalize: true}) }}</label>
+      </div>
+      <!-- Close icon -->
+      <q-icon name="fas fa-times" color="blue-grey" size="20px" class="cursor-pointer"
+              @click="$eventBus.$emit('toggleMasterDrawer', 'chat')"/>
     </div>
 
     <!--Separator-->
