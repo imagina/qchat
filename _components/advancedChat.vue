@@ -118,6 +118,7 @@ export default {
         acceptedFiles: this.acceptFiles,
         height: this.height,
         menuActions: [],
+        userOptions: {minUsers: 1, currentUser: false},
         ...(this.advancedProps || {})
       }
     },
@@ -143,18 +144,13 @@ export default {
             senderId: conversation.lastMessage.userId,
             timestamp: this.$date.getHumanCalendar(conversation.updatedAt)
           },
-          users: [
-            {
-              _id: conversation.users[0].id,
-              username: conversation.users[0].fullName,
-              avatar: conversation.users[0].mainImage,
-            },
-            {
-              _id: conversation.users[1].id,
-              username: conversation.users[1].fullName,
-              avatar: conversation.users[1].mainImage,
-            },
-          ]
+          users: conversation.users.map(user => {
+            return {
+              _id: user.id,
+              username: user.fullName,
+              avatar: user.mainImage,
+            }
+          })
         }
         //Push room
         rooms.push(room)
@@ -218,7 +214,6 @@ export default {
           messages.push(message)
         }
       })
-
       //Response
       return this.$clone(messages)
     },
