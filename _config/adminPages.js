@@ -1,6 +1,6 @@
 export default {
   conversations: {
-    //permission: 'ichat.conversations.manage',
+    permission: 'ichat.conversations.manage',
     activated: true,
     path: '/ichat/conversations',
     name: 'qchat.admin.conversations',
