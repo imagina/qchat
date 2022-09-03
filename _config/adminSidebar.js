@@ -2,5 +2,12 @@ const pages = config('pages') // Get Pages from config
 
 //Ichat
 export default [
-  pages.qchat.conversations
+  {
+    title: 'ichat.cms.sidebar.group',
+    icon: 'far fa-comments',
+    children: [
+      pages.qchat.conversations,
+      pages.qchat.providers
+    ]
+  }
 ]

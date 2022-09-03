@@ -6,5 +6,6 @@ export default {
   urlBase: urlBase,
   version: moduleVersion,
   conversations: `${urlBase}/conversations`,
-  messages: `${urlBase}/messages`
+  messages: `${urlBase}/messages`,
+  providers: `${urlBase}/providers`
 }
