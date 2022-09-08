@@ -3,28 +3,20 @@
     <div id="advanceChatComponentContent" class="relative-position">
       <!--Chat component-->
       <chat-window id="vueAdvanceChat" v-bind="chatProps" @fetch-messages="getMessages" @send-message="sendMessage"
-                   @add-room="showModalSearchUser = true" @menu-action-handler="menuActionHandler"
+                   @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
                    @open-file="({message}) => $helper.openExternalURL(message.file.url, true)"/>
       <!--Dialog to new room-->
-      <q-dialog v-model="showModalSearchUser">
-        <q-card id="showModalSearchUser" class="bg-grey-1">
-          <!--Header Modal-->
-          <q-toolbar class="bg-primary text-white">
-            <q-toolbar-title>
-              {{ this.$tr('isite.cms.label.new') }} {{ this.$tr('isite.cms.label.chat') }}
-            </q-toolbar-title>
-            <q-btn flat v-close-popup icon="fas fa-times"/>
-          </q-toolbar>
-          <div id="modalPostInfo" class="full-width">
-            <q-card class="post-card no-shadow">
-              <!--Content Dynamic-field-->
-              <q-card-section class="post-card__description">
-                <dynamic-field :field="fieldToNewRooms" v-model="userSelected" @input="createRoom"/>
-              </q-card-section>
-            </q-card>
-          </div>
-        </q-card>
-      </q-dialog>
+      <master-modal v-model="modalNewRoom.show" :loading="modalNewRoom.loading"
+                    :title="`${$tr('isite.cms.label.new')} ${$tr('isite.cms.label.chat')}`">
+        <div>
+          <!-- Type -->
+          <dynamic-field v-model="newRoom.type" :field="fieldsToNewRooms.type"/>
+          <!-- Form Type -->
+          <dynamic-form v-model="newRoom.form" v-if="fieldsToNewRooms.blocks[newRoom.type]"
+                        :blocks="fieldsToNewRooms.blocks[newRoom.type]"
+                        default-col-class="col-12" @submit="createRoom"/>
+        </div>
+      </master-modal>
     </div>
   </div>
 </template>
@@ -42,6 +34,7 @@ export default {
     roomId: {default: false},
     roomsId: {default: false},
     allowCreateChat: {default: false},
+    allowProviders: {type: Boolean, defualt: false},
     height: {default: '600px'},
     advancedProps: {default: false},
     loadRooms: {default: true}
@@ -65,7 +58,6 @@ export default {
   },
   data() {
     return {
-      userSelected: null,
       conversations: [],
       conversationMessages: [],
       openRoomId: null,
@@ -82,7 +74,20 @@ export default {
         userId: null,
         userList: []
       },
-      showModalSearchUser: false
+      modalNewRoom: {
+        show: false,
+        loading: false
+      },
+      newRoom: {
+        type: 'user',
+        form: {
+          userId: null,
+          providerType: null,
+          providerId: null,
+          firstName: null,
+          lastName: null
+        }
+      }
     }
   },
   computed: {
@@ -218,18 +223,76 @@ export default {
       return this.$clone(messages)
     },
     //Field to dynamic field, new rooms
-    fieldToNewRooms() {
+    fieldsToNewRooms() {
       return {
-        value: null,
-        type: 'select',
-        props: {
-          label: 'Search...',
-          clearable: true
+        type: {
+          value: 'user',
+          type: 'select',
+          props: {
+            label: this.$tr('isite.cms.form.type'),
+            vIf: this.allowProviders,
+            options: [
+              {label: this.$tr('isite.cms.label.user'), value: 'user'},
+              {label: this.$tr('isite.cms.label.provider'), value: 'provider'}
+            ]
+          }
         },
-        loadOptions: {
-          apiRoute: 'apiRoutes.quser.users',
-          select: {label: 'fullName', id: 'id'},
-          filterByQuery: true
+        blocks: {
+          user: [{
+            fields: {
+              userId: {
+                value: null,
+                type: 'select',
+                required: true,
+                props: {
+                  label: this.$tr('isite.cms.label.user') + "*"
+                },
+                loadOptions: {
+                  apiRoute: 'apiRoutes.quser.users',
+                  select: {label: 'fullName', id: 'id'},
+                  filterByQuery: true
+                }
+              }
+            }
+          }],
+          provider: [{
+            fields: {
+              providerType: {
+                value: null,
+                type: 'select',
+                required: true,
+                props: {
+                  label: this.$tr('isite.cms.label.provider') + "*",
+                },
+                loadOptions: {
+                  apiRoute: 'apiRoutes.qchat.providers',
+                  select: {label: 'name', id: 'name'},
+                }
+              },
+              providerId: {
+                value: null,
+                type: 'input',
+                required: true,
+                props: {
+                  label: this.$tr('isite.cms.label.provider') + " ID*"
+                }
+              },
+              firstName: {
+                value: null,
+                type: 'input',
+                props: {
+                  label: this.$tr('isite.cms.form.firstName')
+                }
+              },
+              lastName: {
+                value: null,
+                type: 'input',
+                props: {
+                  label: this.$tr('isite.cms.form.lastName')
+                }
+              }
+            }
+          }]
         }
       }
     },
@@ -494,42 +557,67 @@ export default {
       }
     },
     //Create conversation
-    createRoom(userId) {
+    createRoom() {
       return new Promise((resolve, reject) => {
-        this.userSelected = null//clear, search crate room
-        this.showModalSearchUser = false//close modal Create room
+        let apiRoute = null
+        let requestParams = null
 
         //validate user selected is not same to auth user
-        if (userId == this.chatProps.currentUserId) {
-          this.showModalSearchUser = false//close modal Create room
-          this.$alert.error(this.$tr('isite.cms.message.errorRequest'))
-          return reject(false)
+        if (this.newRoom.type == "user" && this.newRoom.form.userId) {
+          //Get userId
+          const userId = this.newRoom.form.userId
+
+          if (userId == this.chatProps.currentUserId) {
+            this.modalNewRoom.loading = false
+            this.$alert.error(this.$tr('isite.cms.message.errorRequest'))
+            return reject(false)
+          }
+
+          //Validate if conversation already exist
+          let existConversation = this.conversations.find(conversation => {
+            return conversation.users.find(user => user.id == userId) ? conversation : false
+          })
+
+          //Open conversation
+          if (existConversation) {
+            this.modalNewRoom = {show: false, loading: false}
+            this.openRoomId = existConversation.id
+            return resolve(existConversation)
+          }
+
+          //Request Params
+          apiRoute = 'apiRoutes.qchat.conversations'
+          requestParams = {users: [userId, this.chatProps.currentUserId]}
+        } else {
+          apiRoute = 'apiRoutes.qchat.providerConversations'
+          requestParams = {
+            provider: this.newRoom.form.providerType,
+            conversationId: this.newRoom.form.providerId,
+            firstName: this.newRoom.form.firstName,
+            lastName: this.newRoom.form.lastName
+          }
         }
 
-        //Validate if conversation already exist
-        let existConversation = this.conversations.find(conversation => {
-          return conversation.users.find(user => user.id == userId) ? conversation : false
-        })
-
-        //Open conversation
-        if (existConversation) {
-          this.openRoomId = existConversation.id
-          return resolve(existConversation)
+        if (apiRoute && requestParams) {
+          this.modalNewRoom.loading = true
+          //Request to Create conversation
+          this.$crud.create(apiRoute, requestParams).then(async response => {
+            await this.getRooms(true)
+            this.openRoomId = response.data.id || response.data.conversation?.id
+            this.newRoom.form = {
+              userId: null,
+              providerType: null,
+              providerId: null,
+              firstName: null,
+              lastName: null
+            }
+            this.modalNewRoom = {show: false, loading: false}
+            resolve(response.data)
+          }).catch(error => {
+            this.modalNewRoom = {show: false, loading: false}
+            reject(error)
+          })
         }
-
-        //Request Params
-        let requestParams = {users: [userId, this.chatProps.currentUserId]}
-        this.loading.rooms = true
-        //Request to Create conversation
-        this.$crud.create('apiRoutes.qchat.conversations', requestParams).then(async response => {
-          await this.getRooms(true)
-          this.openRoomId = response.data.id
-          resolve(response.data)
-        }).catch(error => {
-          this.loading.rooms = false
-          reject(error)
-        })
-
       })
     },
     //Menu action handler
@@ -559,7 +647,4 @@ export default {
           font-size 10px
           background-color $blue
 
-#showModalSearchUser
-  min-width 300px !important
-  max-width 300px !important
 </style>

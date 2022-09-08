@@ -1,7 +1,7 @@
 <template>
   <div id="conversationsPage">
     <!--Chat-->
-    <advanced-chat height="calc(100vh - 200px)" allow-create-chat/>
+    <advanced-chat height="calc(100vh - 200px)" allow-create-chat allow-providers/>
   </div>
 </template>
 <script>
