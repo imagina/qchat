@@ -4,7 +4,7 @@
       <!--Chat component-->
       <chat-window id="vueAdvanceChat" v-bind="chatProps" @fetch-messages="getMessages" @send-message="sendMessage"
                    @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
-                   @open-file="({message}) => $helper.openExternalURL(message.file.url, true)"/>
+                   @open-file="({message}) => $helper.openExternalURL(message.files[0].url, true)"/>
       <!--Dialog to new room-->
       <master-modal v-model="modalNewRoom.show" :loading="modalNewRoom.loading"
                     :title="`${$tr('isite.cms.label.new')} ${$tr('isite.cms.label.chat')}`">
@@ -209,7 +209,7 @@ export default {
             avatar: messageData.user.mainImage,
             date: this.$trd(messageData.createdAt),
             timestamp: this.$trd(messageData.createdAt, {type: 'time'}),
-            file: messageData.file || false,
+            files: messageData.file ? (Array.isArray(messageData.file) ? messageData.file : [messageData.file]) : [],
             replyMessage: messageData.replyMessage || false,
             seen: true,
             frontId: messageData.frontId || false
@@ -419,53 +419,71 @@ export default {
       })
     },
     //Send message
-    sendMessage({content, roomId, file, replyMessage}) {
+    sendMessage({content, roomId, files, replyMessage}) {
       return new Promise(async (resolve, reject) => {
-        //Default message data
-        let messageData = {body: content, frontId: this.$uid()}
-
         //Set file information to message
-        if (file) {
-          //Add file to message
-          messageData.file = {
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            extension: `.${file.extension || file.type}`,
-            url: file.localUrl
+        if (files) {
+          files.forEach((file, indexFile) => {
+            //Instance the message
+            let messageWithfile = {
+              body: indexFile == (files.length - 1) ? content : "",
+              frontId: this.$uid(),
+              file: {
+                name: file.name,
+                size: file.size,
+                type: file.extension || file.type,
+                extension: `.${file.extension || file.type}`,
+                url: file.url || file.localUrl,
+                audio: file.audio ? true : false,
+                duration: file.duration || 0
+              }
+            }
+            //push Message
+            this.pushMessage(messageWithfile)
+            //Upload Message
+            this.uploadMessage({
+              ...messageWithfile,
+              roomId,
+              file: {...messageWithfile.file, blob: file.blob}
+            })
+          })
+          //
+        } else {
+          //Instance the message
+          let message = {
+            body: content,
+            frontId: this.$uid(),
+            ...(replyMessage ? {replyMessage} : {})
           }
-          //Add audio to message
-          if (file.audio) {
-            messageData.file.audio = true
-            messageData.file.duration = file.duration
-          }
+          //Push message
+          this.pushMessage(message)
+          //Upload message
+          this.uploadMessage({...message, roomId})
         }
-
-        //Set reply id
-        if (replyMessage) {
-          messageData.replyMessage = replyMessage
-        }
-
-        //push Message
-        this.pushMessage(messageData)
-
+      })
+    },
+    /** Upload Message */
+    uploadMessage(message) {
+      return new Promise(async resolve => {
         //Request data to conversation message
         let requestData = {
-          frontId: messageData.frontId,
-          conversationId: roomId,
-          body: content || '',
+          frontId: message.frontId,
+          conversationId: message.roomId,
+          body: message.body || '',
           userId: this.$store.state.quserAuth.userId,
-          replyToId: replyMessage ? replyMessage._id : null
+          replyToId: message.replyMessage ? message.replyMessage._id : null
         }
 
         //Upload file to media
-        if (file) {
+        if (message.file) {
+          let {file} = message
           //Parse file
           let fileBase64 = await this.$helper.getBase64(file.blob)
           let fileObject = await this.$helper.urlToFile(
               fileBase64,
               file.audio ? file.name : `${file.name}.${file.extension}`,
-              file.type)
+              file.type
+          )
 
           //Form Data
           let fileData = new FormData()
