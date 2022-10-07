@@ -7,6 +7,5 @@ export default {
   version: moduleVersion,
   conversations: `${urlBase}/conversations`,
   messages: `${urlBase}/messages`,
-  providers: `${urlBase}/providers`,
   providerConversations: `${urlBase}/provider/conversations`
 }
