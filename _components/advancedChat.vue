@@ -265,8 +265,17 @@ export default {
                   label: this.$tr('isite.cms.label.provider') + "*",
                 },
                 loadOptions: {
-                  apiRoute: 'apiRoutes.qchat.providers',
-                  select: {label: 'name', id: 'name'},
+                  delayed: () => {
+                    return new Promise(resolve => {
+                      //Request
+                      this.$crud.index('apiRoutes.qnotification.providers', {refresh: true}).then(response => {
+                        resolve(response.data.filter(prov => {
+                          if (prov.data && parseInt(prov.data.status || "0") && parseInt(prov.data.fields?.canCreateConversation || "0"))
+                            return prov
+                        }).map(prov => ({label: prov.name, value: prov.systemName})))
+                      }).catch(error => resolve([]))
+                    })
+                  }
                 }
               },
               providerId: {
@@ -274,7 +283,7 @@ export default {
                 type: 'input',
                 required: true,
                 props: {
-                  label: this.$tr('isite.cms.label.provider') + " ID*"
+                  label: this.$tr('isite.cms.label.contact')+"*"
                 }
               },
               firstName: {
