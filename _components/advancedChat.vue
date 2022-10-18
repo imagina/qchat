@@ -87,6 +87,11 @@ export default {
           firstName: null,
           lastName: null
         }
+      },
+      providers: {
+        whatsapp: {
+          image: `${this.$store.state.qsiteApp.baseUrl}/modules/isite/img/logos/whatsapp.jpg`
+        }
       }
     }
   },
@@ -137,11 +142,16 @@ export default {
 
       //Order room
       conversations.forEach(conversation => {
+        //Instance the roomImage
+        var roomImage = conversation.userConversation.mainImage
+        if (Object.keys(this.providers).includes(conversation.entityType) && roomImage.includes("default.")) {
+          roomImage = this.providers[conversation.entityType].image
+        }
         //Instance roorm
         let room = {
           roomId: conversation.id,
           roomName: conversation.userConversation.fullName,
-          avatar: conversation.userConversation.mainImage,
+          avatar: roomImage,
           unreadCount: conversation.unreadMessagesCount || false,
           messageActions: false,
           lastMessage: !conversation.lastMessage ? false : {
@@ -154,6 +164,9 @@ export default {
               _id: user.id,
               username: user.fullName,
               avatar: user.mainImage,
+              status: {
+                lastChanged: Object.keys(this.providers).includes(conversation.entityType) ? `(${conversation.entityType})` : false
+              }
             }
           })
         }
@@ -283,7 +296,7 @@ export default {
                 type: 'input',
                 required: true,
                 props: {
-                  label: this.$tr('isite.cms.label.contact')+"*"
+                  label: this.$tr('isite.cms.label.contact') + "*"
                 }
               },
               firstName: {
