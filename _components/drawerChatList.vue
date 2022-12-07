@@ -39,10 +39,12 @@
         <!--Conversations list-->
         <q-list v-if="!conversations.loading && conversations.list.length">
           <q-item v-for="(conversation, key) in conversationsList" :key="key" clickable class="q-px-xs"
-                  @click.native="openChat(conversation)">
+                  @click.native="openChat(conversation)" v-if="conversation.userData">
             <!--User picture-->
             <q-item-section avatar>
-              <q-avatar><img :src="conversation.userData.mainImage"></q-avatar>
+              <q-avatar v-if="conversation.userData && conversation.userData.mainImage ? true : false">
+                <img :src="conversation.userData.mainImage">
+              </q-avatar>
             </q-item-section>
             <!--User Fullname-->
             <q-item-section class="ellipsis text-capitalize">
