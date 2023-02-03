@@ -2,9 +2,10 @@
   <div id="advanceChatComponent">
     <div id="advanceChatComponentContent" class="relative-position">
       <!--Chat component-->
-      <chat-window id="vueAdvanceChat" v-bind="chatProps" @fetch-messages="getMessages" @send-message="sendMessage"
+      <chat-window id="vueAdvanceChat" v-bind="chatProps" @send-message="sendMessage"
                    @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
-                   @open-file="({message}) => $helper.openExternalURL(message.files[0].url, true)"/>
+                   @open-file="({message}) => $helper.openExternalURL(message.files[0].url, true)"
+                   @fetch-messages="getMessages" @fetch-more-rooms="getRooms"/>
       <!--Dialog to new room-->
       <master-modal v-model="modalNewRoom.show" :loading="modalNewRoom.loading"
                     :title="`${$tr('isite.cms.label.new')} ${$tr('isite.cms.label.chat')}`">
@@ -92,7 +93,12 @@ export default {
         whatsapp: {
           image: `${this.$store.state.qsiteApp.baseUrl}/modules/isite/img/logos/whatsapp.jpg`
         }
-      }
+      },
+      roomsPagination: {
+        page: 0,
+        perPage: 50,
+        lastPage: -1
+      },
     }
   },
   computed: {
@@ -115,7 +121,7 @@ export default {
         currentUserId: this.$store.state.quserAuth.userId,
         rooms: this.rooms,
         loadingRooms: this.loading.rooms,
-        roomsLoaded: !this.loading.rooms,
+        roomsLoaded: (this.roomsPagination.page == this.roomsPagination.lastPage) ? true : false,
         messages: this.messages,
         loadingMessages: this.loading.messages,
         showReactionEmojis: false,
@@ -129,6 +135,7 @@ export default {
         height: this.height,
         menuActions: [],
         userOptions: {minUsers: 1, currentUser: false},
+        scrollDistance: 10,
         ...(this.advancedProps || {})
       }
     },
@@ -323,7 +330,6 @@ export default {
     init() {
       //Listen events
       this.listenEvents()
-      //Load rooms
       this.getRooms()
     },
     //Listen pusher message
@@ -334,12 +340,11 @@ export default {
       })
     },
     //Get auth user rooms
-    getRooms(refresh = false) {
+    getRooms() {
       return new Promise((resolve, reject) => {
         if (this.loadRooms) {
           this.loading.rooms = true
           this.openRoomId = null//Reset room selected
-          this.conversations = []//Reset conversation
           this.conversationMessages = []//Reset conversation messages
 
           //Request Params
@@ -363,8 +368,18 @@ export default {
               resolve(error)
             })
           } else {//Get user auth rooms
+            //Set pagination
+            requestParams.params = {
+              ...requestParams.params,
+              page: (this.roomsPagination.page + 1),
+              take: 20
+            }
+            //Request
             this.$crud.index('apiRoutes.qchat.conversations', requestParams).then(response => {
               this.orderConversationData(response.data)
+              //Set chat pagination
+              this.roomsPagination.lastPage = response.meta.page.lastPage
+              this.roomsPagination.page = response.meta.page.currentPage
               this.loading.rooms = false
               resolve(response.data)
             }).catch(error => {
@@ -394,7 +409,10 @@ export default {
       })
 
       //Assign conversation data
-      this.conversations = this.$clone(conversations)
+      this.conversations = this.$clone([
+        ...this.conversations,
+        ...conversations
+      ])
     },
     //Get messages
     getMessages({room, options}) {
