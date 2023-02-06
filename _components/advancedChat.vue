@@ -5,7 +5,19 @@
       <chat-window id="vueAdvanceChat" v-bind="chatProps" @send-message="sendMessage"
                    @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
                    @open-file="({message}) => $helper.openExternalURL(message.files[0].url, true)"
-                   @fetch-messages="getMessages" @fetch-more-rooms="getRooms"/>
+                   @fetch-messages="getMessages" @fetch-more-rooms="getRooms">
+        <template #rooms-list-search>
+          <div class="row q-pa-sm justify-between">
+            <!--Search-->
+            <dynamic-field v-model="roomsPagination.search" :field="dynamicfields.search"
+                           @input="val => getRooms({search : val})"/>
+            <!--New Room-->
+            <q-btn color="primary" round unelevated @click="modalNewRoom.show = true">
+              <label class="text-h5 cursor-pointer">+</label>
+            </q-btn>
+          </div>
+        </template>
+      </chat-window>
       <!--Dialog to new room-->
       <master-modal v-model="modalNewRoom.show" :loading="modalNewRoom.loading"
                     :title="`${$tr('isite.cms.label.new')} ${$tr('isite.cms.label.chat')}`">
@@ -95,6 +107,7 @@ export default {
         }
       },
       roomsPagination: {
+        search: null,
         page: 0,
         perPage: 50,
         lastPage: -1
@@ -325,6 +338,18 @@ export default {
         }
       }
     },
+    //Search field
+    dynamicfields() {
+      return {
+        search: {
+          type: 'search',
+          props: {
+            icon: null,
+            clearable: false
+          }
+        }
+      }
+    }
   },
   methods: {
     init() {
@@ -340,9 +365,10 @@ export default {
       })
     },
     //Get auth user rooms
-    getRooms() {
+    getRooms(params = null) {
       return new Promise((resolve, reject) => {
         if (this.loadRooms) {
+          params = params ? params : {}
           this.loading.rooms = true
           this.openRoomId = null//Reset room selected
           this.conversationMessages = []//Reset conversation messages
@@ -371,12 +397,17 @@ export default {
             //Set pagination
             requestParams.params = {
               ...requestParams.params,
-              page: (this.roomsPagination.page + 1),
-              take: 20
+              page: (params.search !== undefined) ? 1 : (this.roomsPagination.page + 1),
+              take: 20,
+              filter: {
+                ...requestParams.params.filter,
+                search: this.roomsPagination.search
+              },
             }
+
             //Request
             this.$crud.index('apiRoutes.qchat.conversations', requestParams).then(response => {
-              this.orderConversationData(response.data)
+              this.orderConversationData(response.data, (response.meta.page.currentPage == 1 ? false : true))
               //Set chat pagination
               this.roomsPagination.lastPage = response.meta.page.lastPage
               this.roomsPagination.page = response.meta.page.currentPage
@@ -391,7 +422,7 @@ export default {
       })
     },
     //Order conversation Data (Transform)
-    orderConversationData(conversations) {
+    orderConversationData(conversations, mergeConversations = true) {
       //Transform data
       conversations.forEach(conversation => {
         //Set to first level conversation user
@@ -409,10 +440,10 @@ export default {
       })
 
       //Assign conversation data
-      this.conversations = this.$clone([
+      this.conversations = mergeConversations ? this.$clone([
         ...this.conversations,
         ...conversations
-      ])
+      ]) : conversations
     },
     //Get messages
     getMessages({room, options}) {
