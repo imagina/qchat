@@ -306,7 +306,11 @@ export default {
                           if (prov.data && parseInt(prov.data.status || "0") && parseInt(prov.data.fields?.canCreateConversation || "0"))
                             return prov
                         }).map(prov => ({label: prov.name, value: prov.systemName})))
-                      }).catch(error => resolve([]))
+                      }).catch(error => {
+                        this.$apiResponse.handleError(error, () => {
+                          resolve([])
+                        })
+                      })
                     })
                   }
                 }
@@ -390,8 +394,10 @@ export default {
               this.loading.rooms = false // stop load Rooms
               resolve(response.data)
             }).catch(error => {
-              this.loading.rooms = false
-              resolve(error)
+              this.$apiResponse.handleError(error, () => {
+                this.loading.rooms = false
+                resolve(error)
+              })
             })
           } else {//Get user auth rooms
             //Set pagination
@@ -414,8 +420,10 @@ export default {
               this.loading.rooms = false
               resolve(response.data)
             }).catch(error => {
-              this.loading.rooms = false
-              resolve(error)
+              this.$apiResponse.handleError(error, () => {
+                this.loading.rooms = false
+                resolve(error)
+              })
             })
           }
         }
@@ -484,8 +492,10 @@ export default {
           this.loading.messages = false
           resolve(response.data)
         }).catch(error => {
-          this.loading.messages = false
-          resolve(error)
+          this.$apiResponse.handleError(error, () => {
+            this.loading.messages = false
+            resolve(error)
+          })
         })
       })
     },

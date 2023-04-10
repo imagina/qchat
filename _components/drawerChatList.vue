@@ -263,8 +263,10 @@ export default {
           this.search.userList = this.$clone(options)
         })
       }).catch(error => {
-        update(() => {
-          this.search.userList = []
+        this.$apiResponse.handleError(error, () => {
+          update(() => {
+            this.search.userList = []
+          })
         })
       })
     },
@@ -283,7 +285,9 @@ export default {
           this.conversations.list = response.data
           this.conversations.loading = false
         }).catch(error => {
-          this.conversations.loading = false
+          this.$apiResponse.handleError(error, () => {
+            this.conversations.loading = false
+          })
         })
       })
     },
@@ -370,7 +374,9 @@ export default {
             this.chat.loading = false
             done()
           }).catch(error => {
-            this.chat.loading = false
+            this.$apiResponse.handleError(error, () => {
+              this.chat.loading = false
+            })
           })
         } else {
           this.$refs.chatInfiniteSroll.stop()//Stop infinite scroll
