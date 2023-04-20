@@ -16,8 +16,11 @@
           </div>
           <!-- List -->
           <div ref="listRoomsContent" :style="`max-height: calc(${height} - 58px); overflow-y: scroll`">
+            <div v-if="!rooms.length && loading.rooms" class="row justify-center q-my-md">
+              <q-spinner-dots color="primary" size="40px"/>
+            </div>
             <q-infinite-scroll @load="(index, done) => getRooms({index, done})" :offset="50"
-                               :scroll-target="$refs.listRoomsContent" ref="infiniteScroll">
+                               :scroll-target="$refs.listRoomsContent" ref="infiniteScroll" debounce="300">
               <q-item v-for="(chat, index) in rooms" :key="index" class="q-pl-sm" clickable
                       @click.native="openRoomId = chat.roomId">
                 <q-item-section top avatar class="q-pr-sm"
@@ -175,8 +178,6 @@ export default {
       return {
         currentUserId: this.$store.state.quserAuth.userId,
         rooms: this.rooms,
-        loadingRooms: this.loading.rooms,
-        roomsLoaded: (this.roomsPagination.page == this.roomsPagination.lastPage) ? true : false,
         messages: this.messages,
         loadingMessages: this.loading.messages,
         showReactionEmojis: false,
@@ -417,8 +418,7 @@ export default {
         if (this.loadRooms) {
           params = {index: 1, done: null, search: null, roomId: null, ...params}
           this.loading.rooms = true
-          this.openRoomId = null//Reset room selected
-          this.conversationMessages = []//Reset conversation messages
+          if (!this.rooms.map(item => item.roomId).includes(this.openRoomId)) this.openRoomId = null
 
           //Request Params
           let requestParams = {
@@ -777,6 +777,7 @@ export default {
       this.$refs.listRoomsContent.scrollTop = 0;
       this.$refs.infiniteScroll.reset();
       this.$refs.infiniteScroll.resume();
+      this.conversations = []
       await this.getRooms({search: val})
       this.$refs.infiniteScroll.setIndex(1)
     }
