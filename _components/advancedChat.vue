@@ -1,23 +1,65 @@
 <template>
   <div id="advanceChatComponent">
     <div id="advanceChatComponentContent" class="relative-position">
-      <!--Chat component-->
-      <chat-window id="vueAdvanceChat" v-bind="chatProps" @send-message="sendMessage"
-                   @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
-                   @open-file="({message}) => $helper.openExternalURL(message.files[0].url, true)"
-                   @fetch-messages="getMessages" @fetch-more-rooms="getRooms">
-        <template #rooms-list-search>
+      <div class="row">
+        <!-- Rooms List -->
+        <div v-if="!roomId" style="width: 300px">
+          <!-- Header -->
           <div class="row q-pa-sm justify-between">
             <!--Search-->
             <dynamic-field v-model="roomsPagination.search" :field="dynamicfields.search"
-                           @input="val => getRooms({search : val})"/>
+                           @input="handleSearch"/>
             <!--New Room-->
             <q-btn color="primary" round unelevated @click="modalNewRoom.show = true">
               <label class="text-h5 cursor-pointer">+</label>
             </q-btn>
           </div>
-        </template>
-      </chat-window>
+          <!-- List -->
+          <div ref="listRoomsContent" :style="`max-height: calc(${height} - 58px); overflow-y: scroll`">
+            <q-infinite-scroll @load="(index, done) => getRooms({index, done})" :offset="50"
+                               :scroll-target="$refs.listRoomsContent" ref="infiniteScroll">
+              <q-item v-for="(chat, index) in rooms" :key="index" class="q-pl-sm" clickable
+                      @click.native="openRoomId = chat.roomId">
+                <q-item-section top avatar class="q-pr-sm"
+                                style="min-width: 48px; max-width: 48px">
+                  <q-avatar><img :src="chat.avatar"></q-avatar>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label class="text-body2 text-blue-grey text-weight-bold" lines="1">
+                    {{ chat.roomName }}
+                  </q-item-label>
+                  <q-item-label caption v-if="chat.phone" class="text-blue-grey">
+                    <q-icon name="fa-light fa-phone" class="q-mr-xs"/>
+                    {{ chat.phone }}
+                  </q-item-label>
+                  <q-item-label caption lines="1">
+                    <q-icon name="fa-light fa-message" class="q-mr-xs"/>
+                    {{ chat.lastMessage.content }}
+                  </q-item-label>
+                </q-item-section>
+
+                <q-item-section side top>
+                  <q-item-label caption>{{ chat.lastMessage.timestamp }}</q-item-label>
+                  <q-badge v-if="chat.unreadCount" color="primary" class="q-mt-sm"
+                           text-color="white" :label="chat.unreadCount"/>
+                </q-item-section>
+              </q-item>
+              <template v-slot:loading>
+                <div class="row justify-center q-my-md">
+                  <q-spinner-dots color="primary" size="40px"/>
+                </div>
+              </template>
+            </q-infinite-scroll>
+          </div>
+        </div>
+        <!--Chat component-->
+        <div class="col">
+          <chat-window id="vueAdvanceChat" v-bind="chatProps" @send-message="sendMessage"
+                       @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
+                       @open-file="({message}) => $helper.openExternalURL(message.files[0].url, true)"
+                       @fetch-messages="getMessages" @fetch-more-rooms="getRooms"/>
+        </div>
+      </div>
       <!--Dialog to new room-->
       <master-modal v-model="modalNewRoom.show" :loading="modalNewRoom.loading"
                     :title="`${$tr('isite.cms.label.new')} ${$tr('isite.cms.label.chat')}`">
@@ -109,8 +151,8 @@ export default {
       roomsPagination: {
         search: null,
         page: 0,
-        perPage: 50,
-        lastPage: -1
+        perPage: 20,
+        total: 0
       },
     }
   },
@@ -140,7 +182,7 @@ export default {
         showReactionEmojis: false,
         messagesLoaded: (this.chatPagination.page == this.chatPagination.lastPage) ? true : false,
         loadFirstRoom: false,
-        singleRoom: this.roomId ? true : false,
+        singleRoom: true,//this.roomId ? true : false,
         roomId: this.openRoomId,
         showAddRoom: this.allowCreateChat,
         messageActions: [{name: 'replyMessage', title: 'Reply'}],
@@ -174,6 +216,7 @@ export default {
           avatar: roomImage,
           unreadCount: conversation.unreadMessagesCount || false,
           messageActions: false,
+          phone: conversation.entityType == "whatsapp" ? conversation.entityId : null,
           lastMessage: !conversation.lastMessage ? false : {
             content: conversation.lastMessage.body || '',
             senderId: conversation.lastMessage.userId,
@@ -188,7 +231,7 @@ export default {
                 lastChanged: Object.keys(this.providers).includes(conversation.entityType) ? `(${conversation.entityType})` : false
               }
             }
-          })
+          }),
         }
         //Push room
         rooms.push(room)
@@ -369,10 +412,10 @@ export default {
       })
     },
     //Get auth user rooms
-    getRooms(params = null) {
+    getRooms(params = {}) {
       return new Promise((resolve, reject) => {
         if (this.loadRooms) {
-          params = params ? params : {}
+          params = {index: 1, done: null, search: null, roomId: null, ...params}
           this.loading.rooms = true
           this.openRoomId = null//Reset room selected
           this.conversationMessages = []//Reset conversation messages
@@ -401,30 +444,36 @@ export default {
             })
           } else {//Get user auth rooms
             //Set pagination
-            requestParams.params = {
-              ...requestParams.params,
-              page: (params.search !== undefined) ? 1 : (this.roomsPagination.page + 1),
-              take: 20,
-              filter: {
-                ...requestParams.params.filter,
-                search: this.roomsPagination.search
-              },
-            }
+            if (params.index == 1 || this.conversations.length < this.roomsPagination.total) {
+              requestParams.params = {
+                ...requestParams.params,
+                page: params.search ? 1 : params.index,
+                take: this.roomsPagination.perPage,
+                filter: {
+                  ...requestParams.params.filter,
+                  search: this.roomsPagination.search
+                },
+              }
 
-            //Request
-            this.$crud.index('apiRoutes.qchat.conversations', requestParams).then(response => {
-              this.orderConversationData(response.data, (response.meta.page.currentPage == 1 ? false : true))
-              //Set chat pagination
-              this.roomsPagination.lastPage = response.meta.page.lastPage
-              this.roomsPagination.page = response.meta.page.currentPage
-              this.loading.rooms = false
-              resolve(response.data)
-            }).catch(error => {
-              this.$apiResponse.handleError(error, () => {
+              //Request
+              this.$crud.index('apiRoutes.qchat.conversations', requestParams).then(response => {
+                this.orderConversationData(response.data, (response.meta.page.currentPage == 1 ? false : true))
+                //Set chat pagination
+                this.roomsPagination.total = response.meta.page.total
+                this.roomsPagination.page = response.meta.page.currentPage
                 this.loading.rooms = false
-                resolve(error)
+                resolve(response.data)
+                if (params.done) params.done()
+              }).catch(error => {
+                this.$apiResponse.handleError(error, () => {
+                  this.loading.rooms = false
+                  resolve(error)
+                  if (params.done) params.done()
+                })
               })
-            })
+            } else {
+              this.$refs.infiniteScroll.stop()
+            }
           }
         }
       })
@@ -722,6 +771,14 @@ export default {
     //Menu action handler
     menuActionHandler({roomId, action}) {
       if (action.action) action.action({roomId, action})
+    },
+    //Handle search
+    async handleSearch(val) {
+      this.$refs.listRoomsContent.scrollTop = 0;
+      this.$refs.infiniteScroll.reset();
+      this.$refs.infiniteScroll.resume();
+      await this.getRooms({search: val})
+      this.$refs.infiniteScroll.setIndex(1)
     }
   }
 }
