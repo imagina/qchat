@@ -213,7 +213,7 @@ export default {
         //Instance roorm
         let room = {
           roomId: conversation.id,
-          roomName: this.getRoomName(conversation),
+          roomName: this.conversationExternalData(conversation).title,
           avatar: roomImage,
           unreadCount: conversation.unreadMessagesCount || false,
           messageActions: false,
@@ -248,6 +248,9 @@ export default {
       //Order room
       conversationMessages.forEach(messageData => {
         if (!messages.find(message => message._id == messageData.id)) {
+          let conversation = this.conversations.find(item => item.id == messageData.conversationId)
+          let rightMessage = !conversation ? false :
+              (this.conversationExternalData(conversation).externalUsers.map(item => item.id).includes(messageData.user.id) ? false : true)
           //Validate reply message
           if (messageData.replyTo) {
             messageData.replyMessage = {
@@ -281,11 +284,11 @@ export default {
           let message = {
             _id: messageData.id,
             content: messageData.body || '',
-            senderId: messageData.user.id,
+            senderId: rightMessage ? this.$store.state.quserAuth.userId : messageData.user.id,
             username: messageData.user.fullName,
             avatar: messageData.user.mainImage,
             date: this.$trd(messageData.createdAt),
-            timestamp: this.$trd(messageData.createdAt, {type: 'time'}),
+            timestamp: `${messageData.statusName || ''} ${this.$trd(messageData.createdAt, {type: 'time'})}`,
             files: messageData.file ? (Array.isArray(messageData.file) ? messageData.file : [messageData.file]) : [],
             replyMessage: messageData.replyMessage || false,
             seen: true,
@@ -782,7 +785,7 @@ export default {
       this.$refs.infiniteScroll.setIndex(1)
     },
     //Return the conversationTitle
-    getRoomName(conversation) {
+    conversationExternalData(conversation) {
       let externalRoles = this.$store.getters['qsiteApp/getSettingValueByName']('ichat::externalRoles') ?? []
       let siteName = this.$store.getters['qsiteApp/getSettingValueByName']('core::site-name')
       let userId = this.$store.state.quserAuth.userId
@@ -791,9 +794,12 @@ export default {
         let userRoles = user.roles.map(item => item.id)
         return this.$array.hasCommonElement(userRoles, externalRoles) || !userRoles.length
       })
-      //Return the conversation title
-      if (externalUsers.map(user => user.id).includes(userId)) return siteName
-      else return externalUsers.map(user => user.fullName).join(', ')
+      //Response
+      return {
+        title: externalUsers.map(user => user.id).includes(userId) ? siteName :
+            externalUsers.map(user => user.fullName).join(', '),
+        externalUsers
+      }
 
     }
   }
