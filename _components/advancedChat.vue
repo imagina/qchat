@@ -199,7 +199,6 @@ export default {
     rooms() {
       let rooms = []//Response
       let conversations = this.$clone(this.conversations)
-
       //Sort conversations
       conversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
 
@@ -210,10 +209,11 @@ export default {
         if (Object.keys(this.providers).includes(conversation.entityType) && roomImage.includes("default.")) {
           roomImage = this.providers[conversation.entityType].image
         }
+
         //Instance roorm
         let room = {
           roomId: conversation.id,
-          roomName: conversation.userConversation.fullName,
+          roomName: this.getRoomName(conversation),
           avatar: roomImage,
           unreadCount: conversation.unreadMessagesCount || false,
           messageActions: false,
@@ -780,6 +780,21 @@ export default {
       this.conversations = []
       await this.getRooms({search: val})
       this.$refs.infiniteScroll.setIndex(1)
+    },
+    //Return the conversationTitle
+    getRoomName(conversation) {
+      let externalRoles = this.$store.getters['qsiteApp/getSettingValueByName']('ichat::externalRoles') ?? []
+      let siteName = this.$store.getters['qsiteApp/getSettingValueByName']('core::site-name')
+      let userId = this.$store.state.quserAuth.userId
+      //Group the users
+      let externalUsers = conversation.users.filter(user => {
+        let userRoles = user.roles.map(item => item.id)
+        return this.$array.hasCommonElement(userRoles, externalRoles) || !userRoles.length
+      })
+      //Return the conversation title
+      if (externalUsers.map(user => user.id).includes(userId)) return siteName
+      else return externalUsers.map(user => user.fullName).join(', ')
+
     }
   }
 }
