@@ -60,7 +60,7 @@
           <chat-window id="vueAdvanceChat" v-bind="chatProps" @send-message="sendMessage"
                        @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
                        @open-file="({message}) => $helper.openExternalURL(message.files[0].url, true)"
-                       @fetch-messages="getMessages" @fetch-more-rooms="getRooms"/>
+                       @fetch-messages="getMessages" @fetch-more-rooms="getRooms" @open-failed-message="showError"/>
         </div>
       </div>
       <!--Dialog to new room-->
@@ -271,6 +271,7 @@ export default {
           //Validate attachment message
           if (messageData.attachment) {
             messageData.file = {
+              id: messageData.attached,
               name: messageData.attachment.filename,
               size: messageData.attachment.filesize,
               type: messageData.attachment.mimetype,
@@ -278,6 +279,28 @@ export default {
               url: messageData.attachment.path,
               audio: messageData.attachment.extension == 'mp3' ? true : false
             }
+          }
+
+          if(messageData.status >= 5) {
+            //Instance systemMessage
+            let systemMessage = {
+              _id: messageData.id + '_',
+              content: messageData.statusName || '',
+              date: this.$trd(messageData.createdAt),
+              senderId: rightMessage ? this.$store.state.quserAuth.userId : messageData.user.id,
+              system: true,
+              frontId: messageData.frontId || false
+            }
+
+            //Push room
+            messages.push(systemMessage)
+
+          }
+
+          // Defined text of status
+          let statusText = '';
+          if (messageData.status) {
+            statusText = messageData.status < 5 ? messageData.statusName : 'No enviado';
           }
 
           //Instance message
@@ -288,10 +311,12 @@ export default {
             username: messageData.user.fullName,
             avatar: messageData.user.mainImage,
             date: this.$trd(messageData.createdAt),
-            timestamp: `${messageData.statusName || ''} ${this.$trd(messageData.createdAt, {type: 'time'})}`,
+            failure: messageData.status >= 5,
+            timestamp: `${statusText} ${this.$trd(messageData.createdAt, {type: 'time'})}`,
             files: messageData.file ? (Array.isArray(messageData.file) ? messageData.file : [messageData.file]) : [],
             replyMessage: messageData.replyMessage || false,
-            seen: true,
+            seen: messageData.status === 3,
+            errorMessage: messageData.status >= 5 ?  messageData.statusName : '',
             frontId: messageData.frontId || false
           }
 
@@ -597,7 +622,7 @@ export default {
     },
     /** Upload Message */
     uploadMessage(message) {
-      return new Promise(async resolve => {
+      return new Promise(async (resolve, reject) => {
         //Request data to conversation message
         let requestData = {
           frontId: message.frontId,
@@ -605,6 +630,13 @@ export default {
           body: message.body || '',
           userId: this.$store.state.quserAuth.userId,
           replyToId: message.replyMessage ? message.replyMessage._id : null
+        }
+
+        //Save file from the previous message
+        if(!!message.files?.length) {
+          const file = message.files[0];
+          requestData.mediasSingle = file.id
+          requestData.attached = file.id
         }
 
         //Upload file to media
@@ -643,7 +675,8 @@ export default {
             this.conversationMessages[messageIndex].id = response.data.id
             this.conversationMessages[messageIndex].attachment = response.data.attachment || false
           }
-        })
+          resolve(response)
+        }).catch(error => reject(error))
       })
     },
     //Push new message
@@ -801,7 +834,37 @@ export default {
         externalUsers
       }
 
-    }
+    },
+    showError({roomId, message}) {
+      this.$alert.warning({
+        mode: 'modal',
+        title: this.$trp('ichat.cms.message.couldNotSend'),
+        message: `<div>${this.$tr('isite.cms.label.error')}: ${message.errorMessage}</div>`,
+        actions: [
+          {label: this.$tr('isite.cms.label.close'), color: 'grey-5'},
+          {
+            label: this.$tr('ichat.cms.label.resend'),
+            color: 'primary',
+            handler: () => {
+              const messageParsed = {
+                ...message,
+                roomId: roomId,
+                body: message.content,
+              }
+
+              // Delete failed Message
+              this.conversationMessages = this.conversationMessages.filter(item => item.id !== message._id);
+              // Push resend Message
+              this.pushMessage(messageParsed)
+
+              this.uploadMessage(messageParsed).then(response => {
+                this.$crud.delete('apiRoutes.qchat.messages', message._id)
+              })
+            }
+          }
+        ]
+      });
+    },
   }
 }
 </script>
