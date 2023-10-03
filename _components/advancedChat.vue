@@ -634,7 +634,7 @@ export default {
 
         //Save file from the previous message
         if(message.attached) {
-          requestData.mediasSingle = message.attached
+          requestData.mediasSingle = {attachment: message.attached}
           requestData.attached = message.attached
         }
 
