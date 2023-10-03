@@ -633,10 +633,9 @@ export default {
         }
 
         //Save file from the previous message
-        if(!!message.files?.length) {
-          const file = message.files[0];
-          requestData.mediasSingle = file.id
-          requestData.attached = file.id
+        if(message.attached) {
+          requestData.mediasSingle = message.attached
+          requestData.attached = message.attached
         }
 
         //Upload file to media
@@ -850,6 +849,7 @@ export default {
                 ...message,
                 roomId: roomId,
                 body: message.content,
+                attached: message.files[0]?.id
               }
 
               // Delete failed Message
