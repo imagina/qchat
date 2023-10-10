@@ -524,11 +524,12 @@ export default {
         conversation.unreadMessagesCount = parseInt(conversation.authUserConversation.unreadMessagesCount)
       })
 
+      if(mergeConversations){
+        // Filter unique conversation by id
+        conversations = this.$array.mergeUniqueBy([...this.conversations, ...conversations], 'id')
+      }
       //Assign conversation data
-      this.conversations = mergeConversations ? this.$clone([
-        ...this.conversations,
-        ...conversations
-      ]) : conversations
+      this.conversations = conversations
     },
     //Get messages
     getMessages({room, options}) {
