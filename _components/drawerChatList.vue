@@ -98,20 +98,8 @@
 
         <!--Chat input-->
         <div id="inputChatContent" class="q-pa-sm">
-          <q-input dense outlined v-model="chat.textMessage" ref="inputChat" placeholder="Type..."
+          <q-input dense outlined v-model="chat.textMessage" ref="inputChat" :placeholder="$tr('ichat.cms.label.sendMessage')"
                    color="grey-8" @keyup.enter="sendMessage">
-            <!--Emoji picker-->
-            <template v-slot:prepend>
-              <twemoji-picker
-                  :pickerWidth="320"
-                  :pickerHeight="230"
-                  @emojiUnicodeAdded="setEmoji"
-                  :emojiData="emojiProps.data"
-                  :emojiGroups="emojiProps.groups"
-                  :recentEmojisFeat="false"
-                  :skinsSelection="false"
-                  searchEmojisFeat/>
-            </template>
             <!--Send button-->
             <template v-slot:append>
               <q-btn unelevated icon="fas fa-paper-plane" @click="sendMessage" padding="sm"/>
@@ -123,16 +111,12 @@
   </div>
 </template>
 <script>
-import {TwemojiPicker} from '@kevinfaguiar/vue-twemoji-picker';
-import EmojiAllData from '@kevinfaguiar/vue-twemoji-picker/emoji-data/es/emoji-all-groups.json';
-import EmojiGroups from '@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json';
-
 export default {
   beforeDestroy() {
     this.$eventBus.$off('inotification.chat.message')
   },
   props: {},
-  components: {'twemoji-picker': TwemojiPicker},
+  components: {},
   watch: {},
   mounted() {
     this.$nextTick(async function () {
@@ -161,11 +145,7 @@ export default {
         messages: [],
         scrollInfo: false,
         textMessage: '',
-      },
-      emojiProps: {
-        data: EmojiAllData,
-        groups: EmojiGroups
-      },
+      }
     }
   },
   computed: {
