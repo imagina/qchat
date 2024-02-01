@@ -54,7 +54,7 @@ export default {
   }
 }
 </script>
-<style lang="stylus">
+<style lang="sass">
 #conversationsPage
   border 2px solid $grey-3
   border-radius $custom-radius

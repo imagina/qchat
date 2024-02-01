@@ -869,7 +869,7 @@ export default {
   }
 }
 </script>
-<style lang="stylus">
+<style lang="sass">
 #advanceChatComponentContent
   #vueAdvanceChat
     &.vac-card-window

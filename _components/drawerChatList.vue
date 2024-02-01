@@ -407,7 +407,7 @@ export default {
   }
 }
 </script>
-<style lang="stylus">
+<style lang="sass">
 #drawerChatComponent
   #userListcontent
     min-height 150px
