@@ -870,23 +870,29 @@ export default {
 }
 </script>
 <style lang="scss">
-#advanceChatComponentContent
-  #vueAdvanceChat
-    &.vac-card-window
-      box-shadow none
+#advanceChatComponentContent {
+  #vueAdvanceChat {
+    &.vac-card-window {
+      box-shadow: none;
+    }
 
-    .vac-room-list
-      .vac-room-item
-        min-height auto
-        padding 8px 10px 8px 8px
+    .vac-room-list {
+      .vac-room-item {
+        min-height: auto;
+        padding: 8px 10px 8px 8px;
 
-        .vac-avatar
-          margin-right 8px
+        .vac-avatar {
+          margin-right: 8px;
+        }
 
-        .vac-badge-counter
-          height 17px
-          width 17px
-          font-size 10px
-          background-color $blue
-
+        .vac-badge-counter {
+          height: 17px;
+          width: 17px;
+          font-size: 10px;
+          background-color: $blue;
+        }
+      }
+    }
+  }
+}
 </style>

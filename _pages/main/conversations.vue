@@ -55,8 +55,9 @@ export default {
 }
 </script>
 <style lang="scss">
-#conversationsPage
-  border 2px solid $grey-3
-  border-radius $custom-radius
-  overflow hidden
+#conversationsPage {
+  border: 2px solid $grey-3;
+  border-radius: $custom-radius;
+  overflow: hidden;
+}
 </style>
