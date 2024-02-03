@@ -408,78 +408,78 @@ export default {
 }
 </script>
 <style lang="scss">
-#drawerChatComponent {
-  #userListcontent {
+#drawer-chat-component {
+  #user-list-content {
     min-height: 150px;
   }
+}
 
-  #personalChatContent {
-    .q-dialog__inner {
-      justify-content: flex-end;
+#personal-chat-content {
+  .q-dialog__inner {
+    justify-content: flex-end;
+  }
+
+  .q-card {
+    overflow-y: hidden !important;
+    border-radius: 10px 10px 0 0;
+    box-shadow: $shadow-9;
+
+    .q-toolbar {
+      .q-toolbar__title {
+        font-size: 14px;
+      }
     }
 
-    .q-card {
-      overflow-y: hidden !important;
-      border-radius: 10px 10px 0 0;
-      box-shadow: $shadow-9;
+    #chat-body-content {
+      height: 360px;
+      max-height: 360px;
+      overflow: auto;
 
-      .q-toolbar {
-        .q-toolbar__title {
-          font-size: 14px;
-        }
+      .q-infinite-scroll {
+        min-height: 360px;
       }
 
-      #chatBodyContent {
-        height: 360px;
-        max-height: 360px;
-        overflow: auto;
-
-        .q-infinite-scroll {
-          min-height: 360px;
+      .q-message {
+        .q-message-stamp {
+          font-size: 10px;
         }
 
-        .q-message {
+        &.q-message-sent {
           .q-message-stamp {
-            font-size: 10px;
-          }
-
-          &.q-message-sent {
-            .q-message-stamp {
-              text-align: right;
-            }
+            text-align: right;
           }
         }
       }
+    }
 
-      #inputChatContent {
-        max-height: 56px;
+    #input-chat-content {
+      max-height: 56px;
 
-        .q-field__control {
-          padding-left: 0;
-          padding-right: 0;
-        }
+      .q-field__control {
+        padding-left: 0;
+        padding-right: 0;
+      }
 
-        #popper-button {
+      #popper-button {
+        height: 40px;
+        width: 40px;
+        outline: none;
+
+        #btn-emoji-default {
+          margin: 0;
           height: 40px;
           width: 40px;
+          padding: 0;
           outline: none;
 
-          #btn-emoji-default {
-            margin: 0;
+          .fade-in {
             height: 40px;
             width: 40px;
-            padding: 0;
-            outline: none;
 
-            .fade-in {
-              height: 40px;
-              width: 40px;
-
-              img {
-                margin-top: 7px;
-                width: 25px;
-                height: 25px;
-              }
+            img {
+              margin-top: 7px;
+              width: 25px;
+              height: 25px;
             }
           }
         }

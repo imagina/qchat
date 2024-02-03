@@ -81,7 +81,8 @@
 <script>
 //Components
 import ChatWindow from 'vue-advanced-chat'
-import 'vue-advanced-chat/dist/vue-advanced-chat.css'
+//[ptc]
+//import 'vue-advanced-chat/dist/vue-advanced-chat.css'
 
 export default {
   beforeDestroy() {
@@ -870,8 +871,8 @@ export default {
 }
 </script>
 <style lang="scss">
-#advanceChatComponentContent {
-  #vueAdvanceChat {
+#advance-chat-component-content {
+  #vue-advance-chat {
     &.vac-card-window {
       box-shadow: none;
     }
