@@ -80,7 +80,7 @@
 </template>
 <script>
 //Components
-import ChatWindow from 'vue-advanced-chat'
+// import ChatWindow from 'vue-advanced-chat'
 //[ptc]
 //import 'vue-advanced-chat/dist/vue-advanced-chat.css'
 
@@ -98,7 +98,8 @@ export default {
     advancedProps: {default: false},
     loadRooms: {default: true}
   },
-  components: {ChatWindow},
+  //[ptc]
+  // components: {ChatWindow},
   watch: {
     roomId() {
       this.getRooms()
