@@ -81,12 +81,13 @@
 <script>
 //Components
 // import ChatWindow from 'vue-advanced-chat'
-//[ptc]
+//[ptc] chatWindow - vue-advanced
 //import 'vue-advanced-chat/dist/vue-advanced-chat.css'
+import eventBus from '@imagina/qsite/_plugins/eventBus'
 
 export default {
   beforeDestroy() {
-    this.$eventBus.$off('inotification.chat.message')
+    eventBus.off('inotification.chat.message')
   },
   props: {
     accept: {default: '.pdf, .xlsx, .docx, .pptx, .mp4, .mp3, .jpg, image/*'},
@@ -438,7 +439,7 @@ export default {
     //Listen pusher message
     listenEvents() {
       //New message from pusher
-      this.$eventBus.$on('inotification.chat.message', (response) => {
+      eventBus.on('inotification.chat.message', (response) => {
         if (response.data) this.pushMessage(response.data)
       })
     },
