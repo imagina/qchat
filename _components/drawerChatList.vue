@@ -8,7 +8,7 @@
       </div>
       <!-- Close icon -->
       <q-icon name="fas fa-times" color="blue-grey" size="20px" class="cursor-pointer"
-              @click="$eventBus.$emit('toggleMasterDrawer', 'chat')"/>
+              @click="eventBus.emit('toggleMasterDrawer', 'chat')"/>
     </div>
 
     <!--Separator-->
@@ -111,9 +111,10 @@
   </div>
 </template>
 <script>
+import eventBus from '@imagina/qsite/_plugins/eventBus'
 export default {
   beforeDestroy() {
-    this.$eventBus.$off('inotification.chat.message')
+    eventBus.off('inotification.chat.message')
   },
   props: {},
   components: {},
@@ -145,7 +146,8 @@ export default {
         messages: [],
         scrollInfo: false,
         textMessage: '',
-      }
+      },
+      eventBus
     }
   },
   computed: {
@@ -167,7 +169,7 @@ export default {
         if (item.unReadMessages) showBadge = true
       })
       //Emit badge to new message
-      this.$eventBus.$emit('header.badge.manage', {chat: showBadge})
+      eventBus.emit('header.badge.manage', {chat: showBadge})
       //Response
       return conversations
     },
@@ -213,7 +215,7 @@ export default {
     },
     //Listen pusher message
     listenPusher() {
-      this.$eventBus.$on('inotification.chat.message', (response) => {
+      eventBus.on('inotification.chat.message', (response) => {
         if (response.data) {
           let message = response.data//Get message
           //Push message
@@ -329,7 +331,7 @@ export default {
         } else doAction()
       }
       //Toogle drawer chat
-      this.$eventBus.$emit('toggleMasterDrawer', 'chat')
+      eventBus.emit('toggleMasterDrawer', 'chat')
     },
     //Get chatData
     getMessages(index, done) {
