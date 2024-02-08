@@ -1,4 +1,4 @@
-const pages = config('pages') // Get Pages from config
+import pages from 'src/config/pages'
 
 //Ichat
 export default [
