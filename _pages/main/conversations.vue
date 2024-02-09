@@ -6,7 +6,7 @@
 </template>
 <script>
 //Components
-import advancedChat from '@imagina/qchat/_components/advancedChat'
+import advancedChat from 'modules/qchat/_components/advancedChat'
 
 export default {
   beforeDestroy() {
