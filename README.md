@@ -6,9 +6,9 @@ Quasar version required 1.9, for earlier versions or 0.17 use version 1.0.0 of t
 
 ### Installation
 
-`` npm i @imagina/qchat ``
+`` npm i src/modules/qchat ``
 
-### Configuration 
+### Configuration
 In you .env file add follow lines and replace data [pusher](https://pusher.com/)
 
 ```dotenv
@@ -33,38 +33,38 @@ PUSHER_APP_CLUSTER="your_pusher_app_cluster"
 
 
 ### Pages
-  
+
 - #### Back-End
 
    | PAGE | NAME | PATH |
    | ------------- | ------------- | ------------- |
    | messages | qchat.admin.messages.index | /chat |
    | conversation | qchat.admin.conversation.show | /chat/conversation/:id |
-  
-### Components  
+
+### Components
 
   | NAME | ROUTE |
   | ------------- | ------------- |
-  | conversation | @imagina/qchat/_components/admin/conversation |
-  | conversations | @imagina/qchat/_components/admin/conversations |
-  | conversationLabel | @imagina/qchat/_components/admin/conversationLabel |
-  | message | @imagina/qchat/_components/admin/message |
-  | messages | @imagina/qchat/_components/admin/messages |
-  | newMessage | @imagina/qchat/_components/admin/newMessage |
-  
+  | conversation | modules/qchat/_components/admin/conversation |
+  | conversations | modules/qchat/_components/admin/conversations |
+  | conversationLabel | modules/qchat/_components/admin/conversationLabel |
+  | message | modules/qchat/_components/admin/message |
+  | messages | modules/qchat/_components/admin/messages |
+  | newMessage | modules/qchat/_components/admin/newMessage |
+
   If you need only a conversation with a specific user, you can use __conversations component__, this component waits for __conversationId__ as a parameter.
-  
+
   Example:
-  
+
   html
   ```html
   <template>
      <conversation :conversationId="conversationId"/>
-  </template> 
+  </template>
   ```
   script
   ```js
-  import conversation from '@imagina/qchat/_components/admin/conversation'
+  import conversation from 'modules/qchat/_components/admin/conversation'
   export default {
     components:{
       conversation
@@ -76,6 +76,6 @@ PUSHER_APP_CLUSTER="your_pusher_app_cluster"
     }
   }
   ```
-  
-  
-  
+
+
+
