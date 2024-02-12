@@ -69,7 +69,7 @@
           <!--User FullName-->
           <q-toolbar-title> {{ chat.conversation.userData.fullName }}</q-toolbar-title>
           <!--Close bottom-->
-          <q-btn flat round dense icon="close" v-close-popup/>
+          <q-btn flat round dense icon="fa fa-close" v-close-popup/>
         </q-toolbar>
 
         <!--Separator-->
