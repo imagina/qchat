@@ -14,7 +14,6 @@ export default {
   },
   props: {},
   components: {advancedChat},
-  watch: {},
   mounted() {
     this.$nextTick(function () {
       this.init()

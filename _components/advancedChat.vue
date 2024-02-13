@@ -7,8 +7,7 @@
           <!-- Header -->
           <div class="row q-pa-sm justify-between">
             <!--Search-->
-            <dynamic-field v-model="roomsPagination.search" :field="dynamicfields.search"
-                           @input="handleSearch"/>
+            <dynamic-field v-model="roomsPagination.search" :field="dynamicfields.search" @input="handleSearch" />
             <!--New Room-->
             <q-btn color="primary" round unelevated @click="modalNewRoom.show = true">
               <label class="text-h5 cursor-pointer">+</label>
@@ -17,14 +16,13 @@
           <!-- List -->
           <div ref="listRoomsContent" :style="`max-height: calc(${height} - 58px); overflow-y: scroll`">
             <div v-if="!rooms.length && loading.rooms" class="row justify-center q-my-md">
-              <q-spinner-dots color="primary" size="40px"/>
+              <q-spinner-dots color="primary" size="40px" />
             </div>
-            <q-infinite-scroll @load="(index, done) => getRooms({index, done})" :offset="50"
-                               :scroll-target="$refs.listRoomsContent" ref="infiniteScroll" debounce="300">
+            <q-infinite-scroll @load="(index, done) => getRooms({ index, done })" :offset="50"
+              :scroll-target="$refs.listRoomsContent" ref="infiniteScroll" debounce="300">
               <q-item v-for="(chat, index) in rooms" :key="index" class="q-pl-sm" clickable
-                      @click.native="openRoomId = chat.roomId">
-                <q-item-section top avatar class="q-pr-sm"
-                                style="min-width: 48px; max-width: 48px">
+                @click.native="openRoomId = chat.roomId">
+                <q-item-section top avatar class="q-pr-sm" style="min-width: 48px; max-width: 48px">
                   <q-avatar><img :src="chat.avatar"></q-avatar>
                 </q-item-section>
                 <q-item-section>
@@ -32,24 +30,24 @@
                     {{ chat.roomName }}
                   </q-item-label>
                   <q-item-label caption v-if="chat.phone" class="text-blue-grey">
-                    <q-icon name="fa-light fa-phone" class="q-mr-xs"/>
+                    <q-icon name="fa-light fa-phone" class="q-mr-xs" />
                     {{ chat.phone }}
                   </q-item-label>
                   <q-item-label caption lines="1">
-                    <q-icon name="fa-light fa-message" class="q-mr-xs"/>
+                    <q-icon name="fa-light fa-message" class="q-mr-xs" />
                     {{ chat.lastMessage.content }}
                   </q-item-label>
                 </q-item-section>
 
                 <q-item-section side top>
                   <q-item-label caption>{{ chat.lastMessage.timestamp }}</q-item-label>
-                  <q-badge v-if="chat.unreadCount" color="primary" class="q-mt-sm"
-                           text-color="white" :label="chat.unreadCount"/>
+                  <q-badge v-if="chat.unreadCount" color="primary" class="q-mt-sm" text-color="white"
+                    :label="chat.unreadCount" />
                 </q-item-section>
               </q-item>
               <template v-slot:loading>
                 <div class="row justify-center q-my-md">
-                  <q-spinner-dots color="primary" size="40px"/>
+                  <q-spinner-dots color="primary" size="40px" />
                 </div>
               </template>
             </q-infinite-scroll>
@@ -57,22 +55,21 @@
         </div>
         <!--Chat component-->
         <div class="col">
-          <chat-window id="vueAdvanceChat" v-bind="chatProps" @send-message="sendMessage"
-                       @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
-                       @open-file="({message}) => $helper.openExternalURL(message.files[0].url, true)"
-                       @fetch-messages="getMessages" @fetch-more-rooms="getRooms" @open-failed-message="showError"/>
+          <vue-advanced-chat id="vueAdvanceChat" v-bind="chatProps" @send-message="sendMessage"
+            @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
+            @open-file="({ message }) => $helper.openExternalURL(message.files[0].url, true)"
+            @fetch-messages="getMessages" @fetch-more-rooms="getRooms" @open-failed-message="showError" />
         </div>
       </div>
       <!--Dialog to new room-->
       <master-modal v-model="modalNewRoom.show" :loading="modalNewRoom.loading"
-                    :title="`${$tr('isite.cms.label.new')} ${$tr('isite.cms.label.chat')}`">
+        :title="`${$tr('isite.cms.label.new')} ${$tr('isite.cms.label.chat')}`">
         <div>
           <!-- Type -->
-          <dynamic-field v-model="newRoom.type" :field="fieldsToNewRooms.type"/>
+          <dynamic-field v-model="newRoom.type" :field="fieldsToNewRooms.type" />
           <!-- Form Type -->
           <dynamic-form v-model="newRoom.form" v-if="fieldsToNewRooms.blocks[newRoom.type]"
-                        :blocks="fieldsToNewRooms.blocks[newRoom.type]"
-                        default-col-class="col-12" @submit="createRoom"/>
+            :blocks="fieldsToNewRooms.blocks[newRoom.type]" default-col-class="col-12" @submit="createRoom" />
         </div>
       </master-modal>
     </div>
@@ -80,7 +77,7 @@
 </template>
 <script>
 //Components
-// import ChatWindow from 'vue-advanced-chat'
+import { register } from 'vue-advanced-chat'
 //[ptc] chatWindow - vue-advanced
 //import 'vue-advanced-chat/dist/vue-advanced-chat.css'
 import eventBus from 'modules/qsite/_plugins/eventBus'
@@ -90,17 +87,20 @@ export default {
     eventBus.off('inotification.chat.message')
   },
   props: {
-    accept: {default: '.pdf, .xlsx, .docx, .pptx, .mp4, .mp3, .jpg, image/*'},
-    roomId: {default: false},
-    roomsId: {default: false},
-    allowCreateChat: {default: false},
-    allowProviders: {type: Boolean, defualt: false},
-    height: {default: '600px'},
-    advancedProps: {default: false},
-    loadRooms: {default: true}
+    accept: { default: '.pdf, .xlsx, .docx, .pptx, .mp4, .mp3, .jpg, image/*' },
+    roomId: { default: false },
+    roomsId: { default: false },
+    allowCreateChat: { default: false },
+    allowProviders: { type: Boolean, defualt: false },
+    height: { default: '600px' },
+    advancedProps: { default: false },
+    loadRooms: { default: true }
   },
   //[ptc]
-  // components: {ChatWindow},
+  // components: { VueAdvancedChat },
+  compilerOptions: {
+    isCustomElement: tag => tag === 'vue-advanced-chat'
+  },
   watch: {
     roomId() {
       this.getRooms()
@@ -182,18 +182,18 @@ export default {
         currentUserId: this.$store.state.quserAuth.userId,
         rooms: this.rooms,
         messages: this.messages,
-        loadingMessages: this.loading.messages,
+        loadingRooms: this.loading.messages,
         showReactionEmojis: false,
         messagesLoaded: (this.chatPagination.page == this.chatPagination.lastPage) ? true : false,
         loadFirstRoom: false,
         singleRoom: true,//this.roomId ? true : false,
         roomId: this.openRoomId,
         showAddRoom: this.allowCreateChat,
-        messageActions: [{name: 'replyMessage', title: 'Reply'}],
+        messageActions: [{ name: 'replyMessage', title: 'Reply' }],
         acceptedFiles: this.acceptFiles,
         height: this.height,
         menuActions: [],
-        userOptions: {minUsers: 1, currentUser: false},
+        usernameOptions: { minUsers: 1, currentUser: false },
         scrollDistance: 10,
         ...(this.advancedProps || {})
       }
@@ -253,7 +253,7 @@ export default {
         if (!messages.find(message => message._id == messageData.id)) {
           let conversation = this.conversations.find(item => item.id == messageData.conversationId)
           let rightMessage = !conversation ? false :
-              (this.conversationExternalData(conversation).externalUsers.map(item => item.id).includes(messageData.user.id) ? false : true)
+            (this.conversationExternalData(conversation).externalUsers.map(item => item.id).includes(messageData.user.id) ? false : true)
           //Validate reply message
           if (messageData.replyTo) {
             messageData.replyMessage = {
@@ -284,7 +284,7 @@ export default {
             }
           }
 
-          if(messageData.status >= 5) {
+          if (messageData.status >= 5) {
             //Instance systemMessage
             let systemMessage = {
               _id: messageData.id + '_',
@@ -315,11 +315,11 @@ export default {
             avatar: messageData.user.mainImage,
             date: this.$trd(messageData.createdAt),
             failure: messageData.status >= 5,
-            timestamp: `${statusText} ${this.$trd(messageData.createdAt, {type: 'time'})}`,
+            timestamp: `${statusText} ${this.$trd(messageData.createdAt, { type: 'time' })}`,
             files: messageData.file ? (Array.isArray(messageData.file) ? messageData.file : [messageData.file]) : [],
             replyMessage: messageData.replyMessage || false,
             seen: messageData.status === 3,
-            errorMessage: messageData.status >= 5 ?  messageData.statusName : '',
+            errorMessage: messageData.status >= 5 ? messageData.statusName : '',
             frontId: messageData.frontId || false
           }
 
@@ -340,8 +340,8 @@ export default {
             label: this.$tr('isite.cms.form.type'),
             vIf: this.allowProviders,
             options: [
-              {label: this.$tr('isite.cms.label.user'), value: 'user'},
-              {label: this.$tr('isite.cms.label.provider'), value: 'provider'}
+              { label: this.$tr('isite.cms.label.user'), value: 'user' },
+              { label: this.$tr('isite.cms.label.provider'), value: 'provider' }
             ]
           }
         },
@@ -357,7 +357,7 @@ export default {
                 },
                 loadOptions: {
                   apiRoute: 'apiRoutes.quser.users',
-                  select: {label: 'fullName', id: 'id'},
+                  select: { label: 'fullName', id: 'id' },
                   filterByQuery: true
                 }
               }
@@ -376,11 +376,11 @@ export default {
                   delayed: () => {
                     return new Promise(resolve => {
                       //Request
-                      this.$crud.index('apiRoutes.qnotification.providers', {refresh: true}).then(response => {
+                      this.$crud.index('apiRoutes.qnotification.providers', { refresh: true }).then(response => {
                         resolve(response.data.filter(prov => {
                           if (prov.data && parseInt(prov.data.status || "0") && parseInt(prov.data.fields?.canCreateConversation || "0"))
                             return prov
-                        }).map(prov => ({label: prov.name, value: prov.systemName})))
+                        }).map(prov => ({ label: prov.name, value: prov.systemName })))
                       }).catch(error => {
                         this.$apiResponse.handleError(error, () => {
                           resolve([])
@@ -433,6 +433,7 @@ export default {
   methods: {
     init() {
       //Listen events
+      register()
       this.listenEvents()
       this.getRooms()
     },
@@ -447,7 +448,7 @@ export default {
     getRooms(params = {}) {
       return new Promise((resolve, reject) => {
         if (this.loadRooms) {
-          params = {index: 1, done: null, search: null, roomId: null, ...params}
+          params = { index: 1, done: null, search: null, roomId: null, ...params }
           this.loading.rooms = true
           if (!this.rooms.map(item => item.roomId).includes(this.openRoomId)) this.openRoomId = null
 
@@ -456,7 +457,7 @@ export default {
             refresh: true,
             params: {
               include: 'users,lastMessage,conversationUsers',
-              filter: {ids: this.$clone(this.roomsId)}
+              filter: { ids: this.$clone(this.roomsId) }
             }
           }
 
@@ -527,7 +528,7 @@ export default {
         conversation.unreadMessagesCount = parseInt(conversation.authUserConversation.unreadMessagesCount)
       })
 
-      if(mergeConversations){
+      if (mergeConversations) {
         // Filter unique conversation by id
         conversations = this.$array.mergeUniqueBy([...this.conversations, ...conversations], 'id')
       }
@@ -535,7 +536,7 @@ export default {
       this.conversations = conversations
     },
     //Get messages
-    getMessages({room, options}) {
+    getMessages({ room, options }) {
       return new Promise((resolve, reject) => {
         this.loading.messages = true
         //Reset room data
@@ -555,7 +556,7 @@ export default {
           params: {
             page: (this.chatPagination.page + 1),
             take: this.chatPagination.perPage,
-            filter: {conversationId: room.roomId},
+            filter: { conversationId: room.roomId },
             include: 'user,replyTo'
           }
         }
@@ -581,7 +582,7 @@ export default {
       })
     },
     //Send message
-    sendMessage({content, roomId, files, replyMessage}) {
+    sendMessage({ content, roomId, files, replyMessage }) {
       return new Promise(async (resolve, reject) => {
         //Set file information to message
         if (files) {
@@ -606,7 +607,7 @@ export default {
             this.uploadMessage({
               ...messageWithfile,
               roomId,
-              file: {...messageWithfile.file, blob: file.blob}
+              file: { ...messageWithfile.file, blob: file.blob }
             })
           })
           //
@@ -615,12 +616,12 @@ export default {
           let message = {
             body: content,
             frontId: this.$uid(),
-            ...(replyMessage ? {replyMessage} : {})
+            ...(replyMessage ? { replyMessage } : {})
           }
           //Push message
           this.pushMessage(message)
           //Upload message
-          this.uploadMessage({...message, roomId})
+          this.uploadMessage({ ...message, roomId })
         }
       })
     },
@@ -637,20 +638,20 @@ export default {
         }
 
         //Save file from the previous message
-        if(message.attached) {
-          requestData.mediasSingle = {attachment: message.attached}
+        if (message.attached) {
+          requestData.mediasSingle = { attachment: message.attached }
           requestData.attached = message.attached
         }
 
         //Upload file to media
         if (message.file) {
-          let {file} = message
+          let { file } = message
           //Parse file
           let fileBase64 = await this.$helper.getBase64(file.blob)
           let fileObject = await this.$helper.urlToFile(
-              fileBase64,
-              file.audio ? file.name : `${file.name}.${file.extension}`,
-              file.type
+            fileBase64,
+            file.audio ? file.name : `${file.name}.${file.extension}`,
+            file.type
           )
 
           //Form Data
@@ -664,7 +665,7 @@ export default {
 
           //Add file id to message
           if (fileMedia && fileMedia.data) {
-            requestData.mediasSingle = {attachment: fileMedia.data.id}
+            requestData.mediasSingle = { attachment: fileMedia.data.id }
             requestData.attached = fileMedia.data.id
           }
         }
@@ -695,7 +696,7 @@ export default {
       let messageData = {
         id: this.$uid(),
         user: (message.userId && conversation) ?
-            conversation.users.find(user => user.id == message.userId) : this.$store.state.quserAuth.userData,
+          conversation.users.find(user => user.id == message.userId) : this.$store.state.quserAuth.userData,
         createdAt: this.$moment().format('YYYY-MM-DD HH:mm:ss'),
         updatedAt: this.$moment().format('YYYY-MM-DD HH:mm:ss'),
         ...message
@@ -767,14 +768,14 @@ export default {
 
           //Open conversation
           if (existConversation) {
-            this.modalNewRoom = {show: false, loading: false}
+            this.modalNewRoom = { show: false, loading: false }
             this.openRoomId = existConversation.id
             return resolve(existConversation)
           }
 
           //Request Params
           apiRoute = 'apiRoutes.qchat.conversations'
-          requestParams = {users: [userId, this.chatProps.currentUserId]}
+          requestParams = { users: [userId, this.chatProps.currentUserId] }
         } else {
           apiRoute = 'apiRoutes.qchat.providerConversations'
           requestParams = {
@@ -798,18 +799,18 @@ export default {
               firstName: null,
               lastName: null
             }
-            this.modalNewRoom = {show: false, loading: false}
+            this.modalNewRoom = { show: false, loading: false }
             resolve(response.data)
           }).catch(error => {
-            this.modalNewRoom = {show: false, loading: false}
+            this.modalNewRoom = { show: false, loading: false }
             reject(error)
           })
         }
       })
     },
     //Menu action handler
-    menuActionHandler({roomId, action}) {
-      if (action.action) action.action({roomId, action})
+    menuActionHandler({ roomId, action }) {
+      if (action.action) action.action({ roomId, action })
     },
     //Handle search
     async handleSearch(val) {
@@ -817,7 +818,7 @@ export default {
       this.$refs.infiniteScroll.reset();
       this.$refs.infiniteScroll.resume();
       this.conversations = []
-      await this.getRooms({search: val})
+      await this.getRooms({ search: val })
       this.$refs.infiniteScroll.setIndex(1)
     },
     //Return the conversationTitle
@@ -833,18 +834,18 @@ export default {
       //Response
       return {
         title: externalUsers.map(user => user.id).includes(userId) ? siteName :
-            externalUsers.map(user => user.fullName).join(', '),
+          externalUsers.map(user => user.fullName).join(', '),
         externalUsers
       }
 
     },
-    showError({roomId, message}) {
+    showError({ roomId, message }) {
       this.$alert.warning({
         mode: 'modal',
         title: this.$trp('ichat.cms.message.couldNotSend'),
         message: `<div>${this.$tr('isite.cms.label.error')}: ${message.errorMessage}</div>`,
         actions: [
-          {label: this.$tr('isite.cms.label.close'), color: 'grey-5'},
+          { label: this.$tr('isite.cms.label.close'), color: 'grey-5' },
           {
             label: this.$tr('ichat.cms.label.resend'),
             color: 'primary',
