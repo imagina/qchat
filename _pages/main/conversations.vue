@@ -5,12 +5,13 @@
   </div>
 </template>
 <script>
+import { eventBus } from 'src/plugins/utils'
 //Components
 import advancedChat from 'modules/qchat/_components/advancedChat'
 
 export default {
   beforeDestroy() {
-    this.$root.$off('page.data.refresh')
+    eventBus.off('page.data.refresh')
   },
   props: {},
   components: {advancedChat},
@@ -29,7 +30,7 @@ export default {
   methods: {
     init() {
       //this.getData()
-      //this.$root.$on('page.data.refresh', () => this.getData(true))
+      //eventBus.on('page.data.refresh', () => this.getData(true))
     },
     //Get data
     getData(refresh = false) {
