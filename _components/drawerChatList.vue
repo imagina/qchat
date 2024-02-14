@@ -20,7 +20,7 @@
       <q-select outlined dense v-model="search.userId" use-input hide-selected emit-value map-options
                 input-debounce="800" :options="search.userList" @filter="searchUsers"
                 :placeholder="`${$tr('isite.cms.label.find')} ${$tr('isite.cms.label.user')}...`"
-                @input="createConversation" style="width: 100%" class="q-mb-sm">
+                @update:modelValue="createConversation" style="width: 100%" class="q-mb-sm">
         <template v-slot:no-option>
           <q-item>
             <q-item-section class="text-grey">

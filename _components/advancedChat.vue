@@ -7,7 +7,7 @@
           <!-- Header -->
           <div class="row q-pa-sm justify-between">
             <!--Search-->
-            <dynamic-field v-model="roomsPagination.search" :field="dynamicfields.search" @input="handleSearch" />
+            <dynamic-field v-model="roomsPagination.search" :field="dynamicfields.search" @update:modelValue="handleSearch" />
             <!--New Room-->
             <q-btn color="primary" round unelevated @click="modalNewRoom.show = true">
               <label class="text-h5 cursor-pointer">+</label>
