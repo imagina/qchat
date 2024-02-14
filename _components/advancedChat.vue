@@ -96,6 +96,7 @@ export default {
     advancedProps: { default: false },
     loadRooms: { default: true }
   },
+  emits:['room-opened'],
   //[ptc]
   // components: { VueAdvancedChat },
   compilerOptions: {
