@@ -80,7 +80,7 @@
 import { register } from 'vue-advanced-chat'
 //[ptc] chatWindow - vue-advanced
 //import 'vue-advanced-chat/dist/vue-advanced-chat.css'
-import eventBus from 'modules/qsite/_plugins/eventBus'
+import { eventBus } from 'src/plugins/utils'
 
 export default {
   beforeDestroy() {

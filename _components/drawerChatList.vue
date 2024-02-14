@@ -111,7 +111,7 @@
   </div>
 </template>
 <script>
-import eventBus from 'modules/qsite/_plugins/eventBus'
+import { eventBus } from 'src/plugins/utils'
 export default {
   beforeDestroy() {
     eventBus.off('inotification.chat.message')
