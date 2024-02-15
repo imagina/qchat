@@ -78,8 +78,6 @@
 <script>
 //Components
 import { register } from 'vue-advanced-chat'
-//[ptc] chatWindow - vue-advanced
-//import 'vue-advanced-chat/dist/vue-advanced-chat.css'
 import { eventBus } from 'src/plugins/utils'
 
 export default {
@@ -97,8 +95,6 @@ export default {
     loadRooms: { default: true }
   },
   emits:['room-opened'],
-  //[ptc]
-  // components: { VueAdvancedChat },
   compilerOptions: {
     isCustomElement: tag => tag === 'vue-advanced-chat'
   },
@@ -209,7 +205,7 @@ export default {
       //Order room
       conversations.forEach(conversation => {
         //Instance the roomImage
-        var roomImage = conversation.userConversation.mainImage
+        var roomImage = conversation?.userConversation?.mainImage
         if (Object.keys(this.providers).includes(conversation.entityType) && roomImage.includes("default.")) {
           roomImage = this.providers[conversation.entityType].image
         }
@@ -231,7 +227,7 @@ export default {
             return {
               _id: user.id,
               username: user.fullName,
-              avatar: user.mainImage,
+              avatar: user?.mainImage,
               status: {
                 lastChanged: Object.keys(this.providers).includes(conversation.entityType) ? `(${conversation.entityType})` : false
               }
@@ -313,7 +309,7 @@ export default {
             content: messageData.body || '',
             senderId: rightMessage ? this.$store.state.quserAuth.userId : messageData.user.id,
             username: messageData.user.fullName,
-            avatar: messageData.user.mainImage,
+            avatar: messageData.user?.mainImage,
             date: this.$trd(messageData.createdAt),
             failure: messageData.status >= 5,
             timestamp: `${statusText} ${this.$trd(messageData.createdAt, { type: 'time' })}`,
