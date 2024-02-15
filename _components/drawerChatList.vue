@@ -42,8 +42,8 @@
                   @click.native="openChat(conversation)" v-if="conversation.userData">
             <!--User picture-->
             <q-item-section avatar>
-              <q-avatar v-if="conversation.userData && conversation.userData.mainImage ? true : false">
-                <img :src="conversation.userData.mainImage">
+              <q-avatar v-if="conversation.userData && conversation.userData?.mainImage ? true : false">
+                <img :src="conversation.userData?.mainImage">
               </q-avatar>
             </q-item-section>
             <!--User Fullname-->
@@ -65,7 +65,7 @@
         <!--Toolbar-->
         <q-toolbar>
           <!--User Image-->
-          <q-avatar><img :src="chat.conversation.userData.mainImage"></q-avatar>
+          <q-avatar><img :src="chat?.conversation?.userData?.mainImage"></q-avatar>
           <!--User FullName-->
           <q-toolbar-title> {{ chat.conversation.userData.fullName }}</q-toolbar-title>
           <!--Close bottom-->
@@ -161,7 +161,7 @@ export default {
         if (userConversation)
           item.userData = {
             id: userConversation.id,
-            mainImage: userConversation.mainImage,
+            mainImage: userConversation?.mainImage,
             fullName: userConversation.fullName
           }
         //Show badge in header
