@@ -1,5 +1,5 @@
 <template>
-  <div id="drawerChatComponent" class="q-pa-md" v-if="$auth.hasAccess('ichat.conversations.index')">
+  <div id="drawerChatComponent" class="q-pa-md" v-if="$hasAccess('ichat.conversations.index')">
     <!-- ===== Header ===== -->
     <div class="row justify-between items-center">
       <div class="text-subtitle1 row items-center">
