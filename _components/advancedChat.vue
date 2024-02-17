@@ -820,8 +820,8 @@ export default {
     },
     //Return the conversationTitle
     conversationExternalData(conversation) {
-      let externalRoles = this.$store.getters['qsiteApp/getSettingValueByName']('ichat::externalRoles') ?? []
-      let siteName = this.$store.getters['qsiteApp/getSettingValueByName']('core::site-name')
+      let externalRoles = this.$getSetting('ichat::externalRoles') ?? []
+      let siteName = this.$getSetting('core::site-name')
       let userId = this.$store.state.quserAuth.userId
       //Group the users
       let externalUsers = conversation.users.filter(user => {
