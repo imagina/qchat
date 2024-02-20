@@ -38,23 +38,32 @@
         <not-result v-if="!conversations.loading && !conversations.list.length" class="q-my-lg"/>
         <!--Conversations list-->
         <q-list v-if="!conversations.loading && conversations.list.length">
-          <q-item v-for="(conversation, key) in conversationsList" :key="key" clickable class="q-px-xs"
-                  @click.native="openChat(conversation)" v-if="conversation.userData">
-            <!--User picture-->
-            <q-item-section avatar>
-              <q-avatar v-if="conversation.userData && conversation.userData?.mainImage ? true : false">
-                <img :src="conversation.userData?.mainImage">
-              </q-avatar>
-            </q-item-section>
-            <!--User Fullname-->
-            <q-item-section class="ellipsis text-capitalize">
-              {{ conversation.userData.fullName.toLowerCase() }}
-            </q-item-section>
-            <!--Unread badge-->
-            <q-item-section v-if="conversation.unReadMessages" side>
-              <q-icon name="fas fa-circle" color="teal" size="14px"/>
-            </q-item-section>
-          </q-item>
+          <template
+            v-for="(conversation, key) in conversationsList"
+            :key="key"
+          >
+            <q-item
+              clickable
+              class="q-px-xs"
+              @click.native="openChat(conversation)"
+              v-if="conversation.userData"
+            >
+              <!--User picture-->
+              <q-item-section avatar>
+                <q-avatar v-if="conversation.userData && conversation.userData?.mainImage ? true : false">
+                  <img :src="conversation.userData?.mainImage">
+                </q-avatar>
+              </q-item-section>
+              <!--User Fullname-->
+              <q-item-section class="ellipsis text-capitalize">
+                {{ conversation.userData.fullName.toLowerCase() }}
+              </q-item-section>
+              <!--Unread badge-->
+              <q-item-section v-if="conversation.unReadMessages" side>
+                <q-icon name="fas fa-circle" color="teal" size="14px"/>
+              </q-item-section>
+            </q-item>
+          </template>
         </q-list>
       </div>
     </div>
