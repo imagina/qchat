@@ -418,13 +418,13 @@ export default {
 }
 </script>
 <style lang="scss">
-#drawer-chat-component {
-  #user-list-content {
+#drawerChatComponent {
+  #userListcontent {
     min-height: 150px;
   }
 }
 
-#personal-chat-content {
+#personalChatContent {
   .q-dialog__inner {
     justify-content: flex-end;
   }
@@ -440,7 +440,7 @@ export default {
       }
     }
 
-    #chat-body-content {
+    #chatBodyContent {
       height: 360px;
       max-height: 360px;
       overflow: auto;
@@ -462,7 +462,7 @@ export default {
       }
     }
 
-    #input-chat-content {
+    #inputChatContent {
       max-height: 56px;
 
       .q-field__control {
