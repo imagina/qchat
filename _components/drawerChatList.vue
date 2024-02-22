@@ -3,7 +3,7 @@
     <!-- ===== Header ===== -->
     <div class="row justify-between items-center">
       <div class="text-subtitle1 row items-center">
-        <q-icon name="fas fa-comment-alt" color="primary" size="20px" class="q-mr-sm"/>
+        <q-icon name="fa-light fa-message" color="primary" size="20px" class="q-mr-sm"/>
         <label>{{ $tr('isite.cms.label.chat', {capitalize: true}) }}</label>
       </div>
       <!-- Close icon -->
