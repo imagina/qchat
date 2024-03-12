@@ -3,20 +3,27 @@
     <div id="advanceChatComponentContent" class="relative-position">
       <div class="row">
         <!-- Rooms List -->
-        <div v-if="!roomId" style="width: 300px">
+        <div v-if="!roomId" v-show="!isMobile ? true : (showSection == 'roomsList' ? true : false)"
+             style="width: 300px">
           <!-- Header -->
-          <div class="row q-pa-sm justify-between">
+          <div class="row q-px-sm q-py-md justify-between">
             <!--Search-->
             <dynamic-field v-model="roomsPagination.search" :field="dynamicfields.search"
                            @input="handleSearch"/>
-            <!--New Room-->
-            <q-btn color="primary" round unelevated @click="modalNewRoom.show = true">
-              <label class="text-h5 cursor-pointer">+</label>
-            </q-btn>
+            <!--Actions-->
+            <template>
+              <!--New Room-->
+              <q-btn color="primary" rounded outline @click="modalNewRoom.show = true"
+                     v-if="appMode == 'iadmin'" icon="fa-light fa-plus" padding="xs sm"/>
+              <!--Refresh-->
+              <q-btn outline color="blue-grey" icon="fa-light fa-rotate-right" rounded @click="getRooms"
+                     padding="xs sm"/>
+            </template>
           </div>
           <!-- List -->
-          <div ref="listRoomsContent" :style="`max-height: calc(${height} - 58px); overflow-y: scroll`">
-            <div v-if="!rooms.length && loading.rooms" class="row justify-center q-my-md">
+          <div ref="listRoomsContent"
+               :style="`height: calc(${height} - 58px); max-height: calc(${height} - 58px); overflow-y: scroll`">
+            <div v-if="!rooms.length && loading.general" class="row justify-center q-my-md">
               <q-spinner-dots color="primary" size="40px"/>
             </div>
             <q-infinite-scroll @load="(index, done) => getRooms({index, done})" :offset="50"
@@ -25,7 +32,7 @@
                       @click.native="openRoomId = chat.roomId">
                 <q-item-section top avatar class="q-pr-sm"
                                 style="min-width: 48px; max-width: 48px">
-                  <q-avatar><img :src="chat.avatar"></q-avatar>
+                  <div :style="`background-image: url(${chat.avatar})`" class="chat-list-image"/>
                 </q-item-section>
                 <q-item-section>
                   <q-item-label class="text-body2 text-blue-grey text-weight-bold" lines="1">
@@ -56,11 +63,22 @@
           </div>
         </div>
         <!--Chat component-->
-        <div class="col">
+        <div class="col" v-show="!isMobile ? true : (showSection == 'chat' ? true : false)">
           <chat-window id="vueAdvanceChat" v-bind="chatProps" @send-message="sendMessage"
                        @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
                        @open-file="({message}) => $helper.openExternalURL(message.files[0].url, true)"
-                       @fetch-messages="getMessages" @fetch-more-rooms="getRooms" @open-failed-message="showError"/>
+                       @fetch-messages="getMessages" @fetch-more-rooms="getRooms" @open-failed-message="showError">
+            <template slot="room-header" v-if="selectedRoom">
+              <div class="q-px-sm row items-center">
+                <q-btn rounded outline color="blue-grey" padding="xs sm" class="q-mr-sm"
+                       @click="showSection='roomsList'" v-if="isMobile">
+                  <span style="font-size: 20px">&#8249;</span>
+                </q-btn>
+                <div :style="`background-image: url(${selectedRoom.avatar})`" class="chat-list-image"/>
+                <b class="q-ml-sm text-blue-grey">{{ selectedRoom.roomName }}</b>
+              </div>
+            </template>
+          </chat-window>
         </div>
       </div>
       <!--Dialog to new room-->
@@ -75,10 +93,13 @@
                         default-col-class="col-12" @submit="createRoom"/>
         </div>
       </master-modal>
+      <!--Inner loading-->
+      <inner-loading :visible="loading.general"/>
     </div>
   </div>
 </template>
 <script>
+import {debounce} from 'quasar'
 //Components
 import ChatWindow from 'vue-advanced-chat'
 import 'vue-advanced-chat/dist/vue-advanced-chat.css'
@@ -106,6 +127,7 @@ export default {
       this.getRooms()
     },
     openRoomId(newValue) {
+      this.showSection = 'chat'
       this.$emit('room-opened', newValue)
     }
   },
@@ -125,6 +147,7 @@ export default {
         lastPage: -1
       },
       loading: {
+        general: false,
         rooms: false,
         messages: false,
       },
@@ -157,6 +180,8 @@ export default {
         perPage: 20,
         total: 0
       },
+      appMode: config('app.mode'),
+      showSection: 'roomsList'
     }
   },
   computed: {
@@ -204,16 +229,20 @@ export default {
 
       //Order room
       conversations.forEach(conversation => {
+        const conversationExternalData = this.conversationExternalData(conversation)
         //Instance the roomImage
-        var roomImage = conversation.userConversation.mainImage
+        var roomImage = conversation.userConversation.mainImage || this.$store.getters['qsiteApp/getSettingMediaByName']('isite::logo1').path
+
         if (Object.keys(this.providers).includes(conversation.entityType) && roomImage.includes("default.")) {
           roomImage = this.providers[conversation.entityType].image
+        } else if (conversation.entityType == "Modules\\User\\Entities\\Sentinel\\User" && conversation.entityId == this.$store.state.quserAuth.userData.id) {
+          roomImage = conversation.organization?.mediaFiles?.mainimage?.smallThumb || this.$store.getters['qsiteApp/getSettingMediaByName']('isite::logo1').path
         }
 
         //Instance roorm
         let room = {
           roomId: conversation.id,
-          roomName: this.conversationExternalData(conversation).title,
+          roomName: conversationExternalData.title,
           avatar: roomImage,
           unreadCount: conversation.unreadMessagesCount || false,
           messageActions: false,
@@ -281,7 +310,7 @@ export default {
             }
           }
 
-          if(messageData.status >= 5) {
+          if (messageData.status >= 5) {
             //Instance systemMessage
             let systemMessage = {
               _id: messageData.id + '_',
@@ -316,7 +345,7 @@ export default {
             files: messageData.file ? (Array.isArray(messageData.file) ? messageData.file : [messageData.file]) : [],
             replyMessage: messageData.replyMessage || false,
             seen: messageData.status === 3,
-            errorMessage: messageData.status >= 5 ?  messageData.statusName : '',
+            errorMessage: messageData.status >= 5 ? messageData.statusName : '',
             frontId: messageData.frontId || false
           }
 
@@ -421,10 +450,17 @@ export default {
           type: 'search',
           props: {
             icon: null,
-            clearable: false
+            clearable: true
           }
         }
       }
+    },
+    //Select room
+    selectedRoom() {
+      return this.openRoomId ? this.rooms.find(item => item.roomId == this.openRoomId) : null
+    },
+    isMobile() {
+      return this.$q.platform.is.mobile
     }
   },
   methods: {
@@ -441,18 +477,18 @@ export default {
       })
     },
     //Get auth user rooms
-    getRooms(params = {}) {
+    getRooms: debounce(function (params = {}) {
       return new Promise((resolve, reject) => {
         if (this.loadRooms) {
           params = {index: 1, done: null, search: null, roomId: null, ...params}
-          this.loading.rooms = true
+          this.loading.general = true
           if (!this.rooms.map(item => item.roomId).includes(this.openRoomId)) this.openRoomId = null
 
           //Request Params
           let requestParams = {
             refresh: true,
             params: {
-              include: 'users,lastMessage,conversationUsers',
+              include: 'users,lastMessage,conversationUsers,organization.files',
               filter: {ids: this.$clone(this.roomsId)}
             }
           }
@@ -462,11 +498,11 @@ export default {
             this.$crud.show('apiRoutes.qchat.conversations', this.roomId, requestParams).then(response => {
               this.orderConversationData([response.data])
               this.openRoomId = this.conversations[0].id
-              this.loading.rooms = false // stop load Rooms
+              this.loading.general = false // stop load Rooms
               resolve(response.data)
             }).catch(error => {
               this.$apiResponse.handleError(error, () => {
-                this.loading.rooms = false
+                this.loading.general = false
                 resolve(error)
               })
             })
@@ -489,12 +525,14 @@ export default {
                 //Set chat pagination
                 this.roomsPagination.total = response.meta.page.total
                 this.roomsPagination.page = response.meta.page.currentPage
-                this.loading.rooms = false
-                resolve(response.data)
+                this.loading.general = false
                 if (params.done) params.done()
+                if (response.meta.page.currentPage == response.meta.page.lastPage) this.$refs.infiniteScroll.stop()
+                this.openSiteConversation()
+                resolve(response.data)
               }).catch(error => {
                 this.$apiResponse.handleError(error, () => {
-                  this.loading.rooms = false
+                  this.loading.general = false
                   resolve(error)
                   if (params.done) params.done()
                 })
@@ -505,6 +543,29 @@ export default {
           }
         }
       })
+    }, 200),
+    //Open the user-site conversation | only for ipanel
+    async openSiteConversation() {
+      const openUserSiteconversation = this.$route.query.openSiteConversation
+      if (openUserSiteconversation && (this.appMode == 'ipanel') && !this.roomId) {
+        this.$router.replace({query: {}})
+        this.loading.general = true
+        let userId = this.$store.state.quserAuth.userId
+        let apiRoute = 'apiRoutes.qchat.conversations'
+
+        //Request data
+        let requestData = {isUserSite: true}
+        if (this.$route.query.organizationId) requestData.organizationId = this.$route.query.organizationId
+
+        //Request
+        this.$crud.create(apiRoute, requestData).then(response => {
+          this.orderConversationData([response.data])
+          this.openRoomId = response.data.id
+          this.loading.general = false
+        }).catch(error => {
+          this.loading.general = false
+        })
+      }
     },
     //Order conversation Data (Transform)
     orderConversationData(conversations, mergeConversations = true) {
@@ -524,7 +585,7 @@ export default {
         conversation.unreadMessagesCount = parseInt(conversation.authUserConversation.unreadMessagesCount)
       })
 
-      if(mergeConversations){
+      if (mergeConversations) {
         // Filter unique conversation by id
         conversations = this.$array.mergeUniqueBy([...this.conversations, ...conversations], 'id')
       }
@@ -634,7 +695,7 @@ export default {
         }
 
         //Save file from the previous message
-        if(message.attached) {
+        if (message.attached) {
           requestData.mediasSingle = {attachment: message.attached}
           requestData.attached = message.attached
         }
@@ -820,13 +881,14 @@ export default {
     //Return the conversationTitle
     conversationExternalData(conversation) {
       let externalRoles = this.$store.getters['qsiteApp/getSettingValueByName']('ichat::externalRoles') ?? []
-      let siteName = this.$store.getters['qsiteApp/getSettingValueByName']('core::site-name')
+      let siteName = conversation.organization?.title || this.$store.getters['qsiteApp/getSettingValueByName']('core::site-name')
       let userId = this.$store.state.quserAuth.userId
       //Group the users
       let externalUsers = conversation.users.filter(user => {
         let userRoles = user.roles.map(item => item.id)
         return this.$array.hasCommonElement(userRoles, externalRoles) || !userRoles.length
       })
+
       //Response
       return {
         title: externalUsers.map(user => user.id).includes(userId) ? siteName :
@@ -871,6 +933,14 @@ export default {
 </script>
 <style lang="stylus">
 #advanceChatComponentContent
+  .chat-list-image
+    height 40px
+    width 40px
+    background-repeat no-repeat
+    background-position center
+    background-size cover
+    border-radius 50%
+
   #vueAdvanceChat
     &.vac-card-window
       box-shadow none
