@@ -10,7 +10,7 @@ import { eventBus } from 'src/plugins/utils'
 import advancedChat from 'modules/qchat/_components/advancedChat'
 
 export default {
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('page.data.refresh')
   },
   props: {},

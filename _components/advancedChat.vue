@@ -81,7 +81,7 @@ import { register } from 'vue-advanced-chat'
 import { eventBus } from 'src/plugins/utils'
 
 export default {
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('inotification.chat.message')
   },
   props: {
