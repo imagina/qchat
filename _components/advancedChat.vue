@@ -7,7 +7,8 @@
           <!-- Header -->
           <div class="row q-pa-sm justify-between">
             <!--Search-->
-            <dynamic-field v-model="roomsPagination.search" :field="dynamicfields.search" @update:modelValue="handleSearch" />
+            <dynamic-field v-model="roomsPagination.search" :field="dynamicfields.search"
+                           @update:modelValue="handleSearch" />
             <!--New Room-->
             <q-btn color="primary" round unelevated @click="modalNewRoom.show = true">
               <label class="text-h5 cursor-pointer">+</label>
@@ -19,9 +20,9 @@
               <q-spinner-dots color="primary" size="40px" />
             </div>
             <q-infinite-scroll @load="(index, done) => getRooms({ index, done })" :offset="50"
-              :scroll-target="$refs.listRoomsContent" ref="infiniteScroll" debounce="300">
+                               :scroll-target="$refs.listRoomsContent" ref="infiniteScroll" debounce="300">
               <q-item v-for="(chat, index) in rooms" :key="index" class="q-pl-sm" clickable
-                @click="openRoomId = chat.roomId">
+                      @click="openRoomId = chat.roomId">
                 <q-item-section top avatar class="q-pr-sm" style="min-width: 48px; max-width: 48px">
                   <q-avatar><img :src="chat.avatar"></q-avatar>
                 </q-item-section>
@@ -42,7 +43,7 @@
                 <q-item-section side top>
                   <q-item-label caption>{{ chat.lastMessage.timestamp }}</q-item-label>
                   <q-badge v-if="chat.unreadCount" color="primary" class="q-mt-sm" text-color="white"
-                    :label="chat.unreadCount" />
+                           :label="chat.unreadCount" />
                 </q-item-section>
               </q-item>
               <template v-slot:loading>
@@ -56,20 +57,22 @@
         <!--Chat component-->
         <div class="col">
           <vue-advanced-chat id="vueAdvanceChat" v-bind="chatProps" @send-message="sendMessage($event.detail[0])"
-             @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
-             @open-file="({ message }) => $helper.openExternalURL(message.files[0].url, true)"
-             @fetch-messages="getMessages($event.detail[0])" @fetch-more-rooms="getRooms($event.detail[0])" @open-failed-message="showError" />
+                             @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
+                             @open-file="({ message }) => $helper.openExternalURL(message.files[0].url, true)"
+                             @fetch-messages="getMessages($event.detail[0])"
+                             @fetch-more-rooms="getRooms($event.detail[0])" @open-failed-message="showError" />
         </div>
       </div>
       <!--Dialog to new room-->
       <master-modal v-model="modalNewRoom.show" :loading="modalNewRoom.loading"
-        :title="`${$tr('isite.cms.label.new')} ${$tr('isite.cms.label.chat')}`">
+                    :title="`${$tr('isite.cms.label.new')} ${$tr('isite.cms.label.chat')}`">
         <div>
           <!-- Type -->
           <dynamic-field v-model="newRoom.type" :field="fieldsToNewRooms.type" />
           <!-- Form Type -->
           <dynamic-form v-model="newRoom.form" v-if="fieldsToNewRooms.blocks[newRoom.type]"
-            :blocks="fieldsToNewRooms.blocks[newRoom.type]" default-col-class="col-12" @submit="createRoom" />
+                        :blocks="fieldsToNewRooms.blocks[newRoom.type]" default-col-class="col-12"
+                        @submit="createRoom" />
         </div>
       </master-modal>
     </div>
@@ -77,12 +80,12 @@
 </template>
 <script>
 //Components
-import { register } from 'vue-advanced-chat'
-import { eventBus } from 'src/plugins/utils'
+import { register } from 'vue-advanced-chat';
+import { eventBus } from 'src/plugins/utils';
 
 export default {
   beforeUnmount() {
-    eventBus.off('inotification.chat.message')
+    eventBus.off('inotification.chat.message');
   },
   props: {
     accept: { default: '.pdf, .xlsx, .docx, .pptx, .mp4, .mp3, .jpg, image/*' },
@@ -94,22 +97,22 @@ export default {
     advancedProps: { default: false },
     loadRooms: { default: true }
   },
-  emits:['room-opened'],
+  emits: ['room-opened'],
   watch: {
     roomId() {
-      this.getRooms()
+      this.getRooms();
     },
     roomsId() {
-      this.getRooms()
+      this.getRooms();
     },
     openRoomId(newValue) {
-      this.$emit('room-opened', newValue)
+      this.$emit('room-opened', newValue);
     }
   },
   mounted() {
-    this.$nextTick(function () {
-      this.init()
-    })
+    this.$nextTick(function() {
+      this.init();
+    });
   },
   data() {
     return {
@@ -123,7 +126,7 @@ export default {
       },
       loading: {
         rooms: false,
-        messages: false,
+        messages: false
       },
       search: {
         userId: null,
@@ -153,26 +156,26 @@ export default {
         page: 0,
         perPage: 20,
         total: 0
-      },
-    }
+      }
+    };
   },
   computed: {
     //Return accept files
     acceptFiles() {
       //Images
-      if (this.accept == 'images') return '.jpg, image/*'
+      if (this.accept == 'images') return '.jpg, image/*';
       //documents
-      if (this.accept == 'documents') return '.pdf, .xlsx, .docx, .pptx'
+      if (this.accept == 'documents') return '.pdf, .xlsx, .docx, .pptx';
       //Media
-      if (this.accept == 'media') return '.mp4, .mp3, .jpg, image/*'
+      if (this.accept == 'media') return '.mp4, .mp3, .jpg, image/*';
 
       //Default
-      let mediaConfig = this.$store.state.qsiteApp.configs.Media
-      return this.$clone(mediaConfig ? mediaConfig['allowed-types'] : this.accept)
+      let mediaConfig = this.$store.state.qsiteApp.configs.Media;
+      return this.$clone(mediaConfig ? mediaConfig['allowed-types'] : this.accept);
     },
     //Chat props
     chatProps() {
-      return {
+      let response = {
         'current-user-id': this.$store.state.quserAuth.userId,
         rooms: this.rooms,
         messages: this.messages,
@@ -191,21 +194,23 @@ export default {
         'username-options': JSON.stringify({ minUsers: 1, currentUser: false }),
         'scroll-distance': 10,
         ...(this.advancedProps || {})
-      }
+      };
+
+      return response;
     },
     //Rooms
     rooms() {
-      let rooms = []//Response
-      let conversations = this.$clone(this.conversations)
+      let rooms = [];//Response
+      let conversations = this.$clone(this.conversations);
       //Sort conversations
-      conversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      conversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
       //Order room
       conversations.forEach(conversation => {
         //Instance the roomImage
-        var roomImage = conversation?.userConversation?.mainImage
-        if (Object.keys(this.providers).includes(conversation.entityType) && roomImage.includes("default.")) {
-          roomImage = this.providers[conversation.providerType].image
+        var roomImage = conversation?.userConversation?.mainImage;
+        if (Object.keys(this.providers).includes(conversation.entityType) && roomImage.includes('default.')) {
+          roomImage = this.providers[conversation.providerType].image;
         }
 
         //Instance roorm
@@ -215,7 +220,7 @@ export default {
           avatar: roomImage,
           unreadCount: conversation.unreadMessagesCount || false,
           messageActions: false,
-          phone: conversation.entityType == "whatsapp" ? conversation.entityId : null,
+          phone: conversation.entityType == 'whatsapp' ? conversation.entityId : null,
           lastMessage: !conversation.lastMessage ? false : {
             content: conversation.lastMessage.body || '',
             senderId: conversation.lastMessage.userId,
@@ -229,26 +234,26 @@ export default {
               status: {
                 lastChanged: Object.keys(this.providers).includes(conversation.entityType) ? `(${conversation.entityType})` : false
               }
-            }
-          }),
-        }
+            };
+          })
+        };
         //Push room
-        rooms.push(room)
+        rooms.push(room);
       })
 
       //Response
-      return this.$clone(rooms)
+      return this.$clone(rooms);
     },
     //Messages
     messages() {
-      let messages = []//Response
-      let conversationMessages = this.$clone(this.conversationMessages).reverse()
+      let messages = [];//Response
+      let conversationMessages = this.$clone(this.conversationMessages).reverse();
       //Order room
       conversationMessages.forEach(messageData => {
         if (!messages.find(message => message._id == messageData.id)) {
-          let conversation = this.conversations.find(item => item.id == messageData.conversationId)
+          let conversation = this.conversations.find(item => item.id == messageData.conversationId);
           let rightMessage = !conversation ? false :
-            (this.conversationExternalData(conversation).externalUsers.map(item => item.id).includes(messageData.user.id) ? false : true)
+            (this.conversationExternalData(conversation).externalUsers.map(item => item.id).includes(messageData.user.id) ? false : true);
           //Validate reply message
           if (messageData.replyTo) {
             messageData.replyMessage = {
@@ -263,7 +268,7 @@ export default {
                 url: messageData.replyTo.attachment.path,
                 audio: messageData.replyTo.attachment.extension == 'mp3' ? true : false
               }
-            }
+            };
           }
 
           //Validate attachment message
@@ -276,7 +281,7 @@ export default {
               extension: `.${messageData.attachment.extension}`,
               url: messageData.attachment.path,
               audio: messageData.attachment.extension == 'mp3' ? true : false
-            }
+            };
           }
 
           if (messageData.status >= 5) {
@@ -288,10 +293,10 @@ export default {
               senderId: rightMessage ? this.$store.state.quserAuth.userId : messageData.user.id,
               system: true,
               frontId: messageData.frontId || false
-            }
+            };
 
             //Push room
-            messages.push(systemMessage)
+            messages.push(systemMessage);
 
           }
 
@@ -316,14 +321,14 @@ export default {
             seen: messageData.status === 3,
             errorMessage: messageData.status >= 5 ? messageData.statusName : '',
             frontId: messageData.frontId || false
-          }
+          };
 
           //Push room
-          messages.push(message)
+          messages.push(message);
         }
-      })
+      });
       //Response
-      return this.$clone(messages)
+      return this.$clone(messages);
     },
     //Field to dynamic field, new rooms
     fieldsToNewRooms() {
@@ -348,7 +353,7 @@ export default {
                 type: 'select',
                 required: true,
                 props: {
-                  label: this.$tr('isite.cms.label.user') + "*"
+                  label: this.$tr('isite.cms.label.user') + '*'
                 },
                 loadOptions: {
                   apiRoute: 'apiRoutes.quser.users',
@@ -365,7 +370,7 @@ export default {
                 type: 'select',
                 required: true,
                 props: {
-                  label: this.$tr('isite.cms.label.provider') + "*",
+                  label: this.$tr('isite.cms.label.provider') + '*'
                 },
                 loadOptions: {
                   delayed: () => {
@@ -373,15 +378,15 @@ export default {
                       //Request
                       this.$crud.index('apiRoutes.qnotification.providers', { refresh: true }).then(response => {
                         resolve(response.data.filter(prov => {
-                          if (prov.data && parseInt(prov.data.status || "0") && parseInt(prov.data.fields?.canCreateConversation || "0"))
-                            return prov
-                        }).map(prov => ({ label: prov.name, value: prov.systemName })))
+                          if (prov.data && parseInt(prov.data.status || '0') && parseInt(prov.data.fields?.canCreateConversation || '0'))
+                            return prov;
+                        }).map(prov => ({ label: prov.name, value: prov.systemName })));
                       }).catch(error => {
                         this.$apiResponse.handleError(error, () => {
-                          resolve([])
-                        })
-                      })
-                    })
+                          resolve([]);
+                        });
+                      });
+                    });
                   }
                 }
               },
@@ -390,7 +395,7 @@ export default {
                 type: 'input',
                 required: true,
                 props: {
-                  label: this.$tr('isite.cms.label.contact') + "*"
+                  label: this.$tr('isite.cms.label.contact') + '*'
                 }
               },
               firstName: {
@@ -410,7 +415,7 @@ export default {
             }
           }]
         }
-      }
+      };
     },
     //Search field
     dynamicfields() {
@@ -422,30 +427,30 @@ export default {
             clearable: false
           }
         }
-      }
+      };
     }
   },
   methods: {
     init() {
       //Listen events
-      register()
-      this.listenEvents()
-      this.getRooms()
+      register();
+      this.listenEvents();
+      this.getRooms();
     },
     //Listen pusher message
     listenEvents() {
       //New message from pusher
       eventBus.on('inotification.chat.message', (response) => {
-        if (response.data) this.pushMessage(response.data)
-      })
+        if (response.data) this.pushMessage(response.data);
+      });
     },
     //Get auth user rooms
     getRooms(params = {}) {
       return new Promise((resolve, reject) => {
         if (this.loadRooms) {
-          params = { index: 1, done: null, search: null, roomId: null, ...params }
-          this.loading.rooms = true
-          if (!this.rooms.map(item => item.roomId).includes(this.openRoomId)) this.openRoomId = null
+          params = { index: 1, done: null, search: null, roomId: null, ...params };
+          this.loading.rooms = true;
+          if (!this.rooms.map(item => item.roomId).includes(this.openRoomId)) this.openRoomId = null;
 
           //Request Params
           let requestParams = {
@@ -454,21 +459,21 @@ export default {
               include: 'users,lastMessage,conversationUsers',
               filter: { ids: this.$clone(this.roomsId) }
             }
-          }
+          };
 
           //Request
           if (this.roomId) {//Get only one room
             this.$crud.show('apiRoutes.qchat.conversations', this.roomId, requestParams).then(response => {
-              this.orderConversationData([response.data])
-              this.openRoomId = this.conversations[0].id
-              this.loading.rooms = false // stop load Rooms
-              resolve(response.data)
+              this.orderConversationData([response.data]);
+              this.openRoomId = this.conversations[0].id;
+              this.loading.rooms = false; // stop load Rooms
+              resolve(response.data);
             }).catch(error => {
               this.$apiResponse.handleError(error, () => {
-                this.loading.rooms = false
-                resolve(error)
-              })
-            })
+                this.loading.rooms = false;
+                resolve(error);
+              });
+            });
           } else {//Get user auth rooms
             //Set pagination
             if (params.index == 1 || this.conversations.length < this.roomsPagination.total) {
@@ -479,31 +484,31 @@ export default {
                 filter: {
                   ...requestParams.params.filter,
                   search: this.roomsPagination.search
-                },
-              }
+                }
+              };
 
               //Request
               this.$crud.index('apiRoutes.qchat.conversations', requestParams).then(response => {
-                this.orderConversationData(response.data, (response.meta.page.currentPage == 1 ? false : true))
+                this.orderConversationData(response.data, (response.meta.page.currentPage == 1 ? false : true));
                 //Set chat pagination
-                this.roomsPagination.total = response.meta.page.total
-                this.roomsPagination.page = response.meta.page.currentPage
-                this.loading.rooms = false
-                resolve(response.data)
-                if (params.done) params.done()
+                this.roomsPagination.total = response.meta.page.total;
+                this.roomsPagination.page = response.meta.page.currentPage;
+                this.loading.rooms = false;
+                resolve(response.data);
+                if (params.done) params.done();
               }).catch(error => {
                 this.$apiResponse.handleError(error, () => {
-                  this.loading.rooms = false
-                  resolve(error)
-                  if (params.done) params.done()
-                })
-              })
+                  this.loading.rooms = false;
+                  resolve(error);
+                  if (params.done) params.done();
+                });
+              });
             } else {
-              this.$refs.infiniteScroll.stop()
+              this.$refs.infiniteScroll.stop();
             }
           }
         }
-      })
+      });
     },
     //Order conversation Data (Transform)
     orderConversationData(conversations, mergeConversations = true) {
@@ -513,38 +518,38 @@ export default {
         conversation.userConversation = {
           ...conversation.conversationUsers.find(user => user.userId != this.$store.state.quserAuth.userId),
           ...conversation.users.find(user => user.id != this.$store.state.quserAuth.userId)
-        }
+        };
         //Set to first level conversation auth user
         conversation.authUserConversation = {
           ...conversation.conversationUsers.find(user => user.userId == this.$store.state.quserAuth.userId),
           ...conversation.users.find(user => user.id == this.$store.state.quserAuth.userId)
-        }
+        };
         //Set to first level unread messages count
-        conversation.unreadMessagesCount = parseInt(conversation.authUserConversation.unreadMessagesCount)
-      })
+        conversation.unreadMessagesCount = parseInt(conversation.authUserConversation.unreadMessagesCount);
+      });
 
       if (mergeConversations) {
         // Filter unique conversation by id
-        conversations = this.$array.mergeUniqueBy([...this.conversations, ...conversations], 'id')
+        conversations = this.$array.mergeUniqueBy([...this.conversations, ...conversations], 'id');
       }
       //Assign conversation data
-      this.conversations = conversations
+      this.conversations = conversations;
     },
     //Get messages
     getMessages({ room, options }) {
       return new Promise((resolve, reject) => {
-        this.loading.messages = true
+        this.loading.messages = true;
         //Reset room data
         if (options && options.reset) {
-          this.conversationMessages = []//Reset chat messages
-          this.chatPagination.page = 0//Reset chat page
-          this.chatPagination.lastPage = -1//Reset chat plast page
+          this.conversationMessages = [];//Reset chat messages
+          this.chatPagination.page = 0;//Reset chat page
+          this.chatPagination.lastPage = -1;//Reset chat plast page
         }
         //Order room data after open
-        let roomId = room?.roomId ?? this.openRoomId//Set open room id
+        let roomId = room?.roomId ?? this.openRoomId;//Set open room id
         //Reset unread message to conversation
-        let conversationIndex = this.conversations.findIndex(item => item.id == roomId)
-        this.conversations[conversationIndex].unreadMessagesCount = false
+        let conversationIndex = this.conversations.findIndex(item => item.id == roomId);
+        this.conversations[conversationIndex].unreadMessagesCount = false;
         //Request params
         let requestParams = {
           refresh: true,
@@ -554,27 +559,27 @@ export default {
             filter: { conversationId: roomId },
             include: 'user,replyTo'
           }
-        }
+        };
 
         //Request
         this.$crud.index('apiRoutes.qchat.messages', requestParams).then(response => {
           //reset conversation messages
-          if (options && options.reset) this.conversationMessages = []
+          if (options && options.reset) this.conversationMessages = [];
           //Set messages
-          this.conversationMessages = this.$clone([...this.conversationMessages, ...response.data])
+          this.conversationMessages = this.$clone([...this.conversationMessages, ...response.data]);
           //Set chat pagination
-          this.chatPagination.lastPage = response.meta.page.lastPage
-          this.chatPagination.page = response.meta.page.currentPage
+          this.chatPagination.lastPage = response.meta.page.lastPage;
+          this.chatPagination.page = response.meta.page.currentPage;
           //Hide loading
-          this.loading.messages = false
-          resolve(response.data)
+          this.loading.messages = false;
+          resolve(response.data);
         }).catch(error => {
           this.$apiResponse.handleError(error, () => {
-            this.loading.messages = false
-            resolve(error)
-          })
-        })
-      })
+            this.loading.messages = false;
+            resolve(error);
+          });
+        });
+      });
     },
     //Send message
     sendMessage({ content, roomId, files, replyMessage }) {
@@ -584,7 +589,7 @@ export default {
           files.forEach((file, indexFile) => {
             //Instance the message
             let messageWithfile = {
-              body: indexFile == (files.length - 1) ? content : "",
+              body: indexFile == (files.length - 1) ? content : '',
               frontId: this.$uid(),
               file: {
                 name: file.name,
@@ -595,16 +600,16 @@ export default {
                 audio: file.audio ? true : false,
                 duration: file.duration || 0
               }
-            }
+            };
             //push Message
-            this.pushMessage(messageWithfile)
+            this.pushMessage(messageWithfile);
             //Upload Message
             this.uploadMessage({
               ...messageWithfile,
               roomId,
               file: { ...messageWithfile.file, blob: file.blob }
-            })
-          })
+            });
+          });
           //
         } else {
           //Instance the message
@@ -612,13 +617,13 @@ export default {
             body: content,
             frontId: this.$uid(),
             ...(replyMessage ? { replyMessage } : {})
-          }
+          };
           //Push message
-          this.pushMessage(message)
+          this.pushMessage(message);
           //Upload message
-          this.uploadMessage({ ...message, roomId })
+          this.uploadMessage({ ...message, roomId });
         }
-      })
+      });
     },
     /** Upload Message */
     uploadMessage(message) {
@@ -630,62 +635,62 @@ export default {
           body: message.body || '',
           userId: this.$store.state.quserAuth.userId,
           replyToId: message.replyMessage ? message.replyMessage._id : null
-        }
+        };
 
         //Save file from the previous message
         if (message.attached) {
-          requestData.mediasSingle = { attachment: message.attached }
-          requestData.attached = message.attached
+          requestData.mediasSingle = { attachment: message.attached };
+          requestData.attached = message.attached;
         }
 
         //Upload file to media
         if (message.file) {
-          let { file } = message
+          let { file } = message;
           //Parse file
-          let fileBase64 = await this.$helper.getBase64(file.blob)
+          let fileBase64 = await this.$helper.getBase64(file.blob);
           let fileObject = await this.$helper.urlToFile(
             fileBase64,
             file.audio ? file.name : `${file.name}.${file.extension}`,
             file.type
-          )
+          );
 
           //Form Data
-          let fileData = new FormData()
-          fileData.append('parent_id', 0)
-          fileData.append('file', fileObject)
-          fileData.append('disk', 'privatemedia')
+          let fileData = new FormData();
+          fileData.append('parent_id', 0);
+          fileData.append('file', fileObject);
+          fileData.append('disk', 'privatemedia');
 
           //Request send file
-          let fileMedia = await this.$crud.post('apiRoutes.qmedia.files', fileData)
+          let fileMedia = await this.$crud.post('apiRoutes.qmedia.files', fileData);
 
           //Add file id to message
           if (fileMedia && fileMedia.data) {
-            requestData.mediasSingle = { attachment: fileMedia.data.id }
-            requestData.attached = fileMedia.data.id
+            requestData.mediasSingle = { attachment: fileMedia.data.id };
+            requestData.attached = fileMedia.data.id;
           }
         }
 
         //Request
         this.$crud.create('apiRoutes.qchat.messages', requestData).then(response => {
           //Search message by frontId
-          let messageIndex = this.conversationMessages.findIndex(item => item.frontId == response.data.frontId)
+          let messageIndex = this.conversationMessages.findIndex(item => item.frontId == response.data.frontId);
           //Set db message id to local message
           if (messageIndex != -1) {
-            this.conversationMessages[messageIndex].id = response.data.id
-            this.conversationMessages[messageIndex].attachment = response.data.attachment || false
+            this.conversationMessages[messageIndex].id = response.data.id;
+            this.conversationMessages[messageIndex].attachment = response.data.attachment || false;
           }
-          resolve(response)
-        }).catch(error => reject(error))
-      })
+          resolve(response);
+        }).catch(error => reject(error));
+      });
     },
     //Push new message
     pushMessage(message) {
       //Get current conversation ID
-      let conversationId = message.conversation ? message.conversation.id : this.openRoomId
+      let conversationId = message.conversation ? message.conversation.id : this.openRoomId;
       //Get current conversation Index
-      let conversationIndex = conversationId ? this.conversations.findIndex(item => item.id == conversationId) : false
+      let conversationIndex = conversationId ? this.conversations.findIndex(item => item.id == conversationId) : false;
       //Get current conversation
-      let conversation = (conversationIndex >= 0) ? this.conversations[conversationIndex] : false
+      let conversation = (conversationIndex >= 0) ? this.conversations[conversationIndex] : false;
 
       //Message object data
       let messageData = {
@@ -695,35 +700,35 @@ export default {
         createdAt: this.$moment().format('YYYY-MM-DD HH:mm:ss'),
         updatedAt: this.$moment().format('YYYY-MM-DD HH:mm:ss'),
         ...message
-      }
+      };
 
       //Add conversation if not exist
       if (!conversation && message.conversation) {
         this.orderConversationData([...this.conversations, {
           ...message.conversation,
           lastMessage: messageData
-        }])
+        }]);
       }
 
       //Update conversation data
       if (conversation) {
         //Update last update date
-        this.conversations[conversationIndex].updatedAt = this.$moment().format('YYYY-MM-DD HH:mm:ss')
+        this.conversations[conversationIndex].updatedAt = this.$moment().format('YYYY-MM-DD HH:mm:ss');
         //Update last message
-        this.conversations[conversationIndex].lastMessage = messageData
+        this.conversations[conversationIndex].lastMessage = messageData;
         //Add unread message counter
         if (message.conversation && (message.conversation.id != this.openRoomId)) {
-          this.conversations[conversationIndex].unreadMessagesCount += 1
+          this.conversations[conversationIndex].unreadMessagesCount += 1;
         }
       }
 
       //Set local message
       if (!message.conversation || (message.conversation.id == this.openRoomId)) {
-        this.conversationMessages.unshift(messageData)
+        this.conversationMessages.unshift(messageData);
       }
 
       //Play sound
-      this.playSound(message)
+      this.playSound(message);
     },
     //Play sound message
     playSound(message) {
@@ -731,107 +736,106 @@ export default {
       if (message.conversation && (message.conversation.id != this.openRoomId)) {
         this.$helper.playSound({
           url: `${this.$store.state.qsiteApp.baseUrl}/modules/ichat/audio/sound_chat_notification.mp3`
-        })
+        });
       } else if (message.userId && (message.userId != this.$store.state.quserAuth.userId)) {
         this.$helper.playSound({
           url: `${this.$store.state.qsiteApp.baseUrl}/modules/ichat/audio/sound_message_notification.mp3`,
           volume: 0.2
-        })
+        });
       }
     },
     //Create conversation
     createRoom() {
       return new Promise((resolve, reject) => {
-        let apiRoute = null
-        let requestParams = null
+        let apiRoute = null;
+        let requestParams = null;
 
         //validate user selected is not same to auth user
-        if (this.newRoom.type == "user" && this.newRoom.form.userId) {
+        if (this.newRoom.type == 'user' && this.newRoom.form.userId) {
           //Get userId
-          const userId = this.newRoom.form.userId
+          const userId = this.newRoom.form.userId;
 
-          if (userId == this.chatProps.currentUserId) {
-            this.modalNewRoom.loading = false
-            this.$alert.error(this.$tr('isite.cms.message.errorRequest'))
-            return reject(false)
+          if (userId == this.chatProps['current-user-id']) {
+            this.modalNewRoom.loading = false;
+            this.$alert.error(this.$tr('isite.cms.message.errorRequest'));
+            return reject(false);
           }
 
           //Validate if conversation already exist
           let existConversation = this.conversations.find(conversation => {
-            return conversation.users.find(user => user.id == userId) ? conversation : false
-          })
+            return conversation.users.find(user => user.id == userId) ? conversation : false;
+          });
 
           //Open conversation
           if (existConversation) {
-            this.modalNewRoom = { show: false, loading: false }
-            this.openRoomId = existConversation.id
-            return resolve(existConversation)
+            this.modalNewRoom = { show: false, loading: false };
+            this.openRoomId = existConversation.id;
+            return resolve(existConversation);
           }
-
           //Request Params
-          apiRoute = 'apiRoutes.qchat.conversations'
-          requestParams = { users: [userId, this.chatProps.currentUserId] }
+          apiRoute = 'apiRoutes.qchat.conversations';
+          requestParams = { users: [userId, this.chatProps['current-user-id']] };
         } else {
-          apiRoute = 'apiRoutes.qchat.providerConversations'
+          apiRoute = 'apiRoutes.qchat.providerConversations';
           requestParams = {
             provider: this.newRoom.form.providerType,
             conversationId: this.newRoom.form.providerId,
             firstName: this.newRoom.form.firstName,
             lastName: this.newRoom.form.lastName
-          }
+          };
         }
 
         if (apiRoute && requestParams) {
-          this.modalNewRoom.loading = true
+          this.modalNewRoom.loading = true;
           //Request to Create conversation
           this.$crud.create(apiRoute, requestParams).then(async response => {
-            await this.getRooms(true)
-            this.openRoomId = response.data.id || response.data.conversation?.id
+            await this.getRooms(true);
+            this.openRoomId = response.data.id || response.data.conversation?.id;
             this.newRoom.form = {
               userId: null,
               providerType: null,
               providerId: null,
               firstName: null,
               lastName: null
-            }
-            this.modalNewRoom = { show: false, loading: false }
-            resolve(response.data)
+            };
+            this.modalNewRoom = { show: false, loading: false };
+            resolve(response.data);
           }).catch(error => {
-            this.modalNewRoom = { show: false, loading: false }
-            reject(error)
-          })
+            this.modalNewRoom = { show: false, loading: false };
+            reject(error);
+          });
         }
-      })
+      });
     },
     //Menu action handler
     menuActionHandler({ roomId, action }) {
-      if (action.action) action.action({ roomId, action })
+      if (action.action) action.action({ roomId, action });
     },
     //Handle search
     async handleSearch(val) {
       this.$refs.listRoomsContent.scrollTop = 0;
       this.$refs.infiniteScroll.reset();
       this.$refs.infiniteScroll.resume();
-      this.conversations = []
-      await this.getRooms({ search: val })
-      this.$refs.infiniteScroll.setIndex(1)
+      this.conversations = [];
+      await this.getRooms({ search: val });
+      this.$refs.infiniteScroll.setIndex(1);
     },
     //Return the conversationTitle
     conversationExternalData(conversation) {
-      let externalRoles = this.$getSetting('ichat::externalRoles') ?? []
-      let siteName = this.$getSetting('core::site-name')
-      let userId = this.$store.state.quserAuth.userId
+      let externalRoles = this.$getSetting('ichat::externalRoles') ?? [];
+      let siteName = this.$getSetting('core::site-name');
+      let userId = this.$store.state.quserAuth.userId;
       //Group the users
       let externalUsers = conversation.users.filter(user => {
-        let userRoles = user.roles.map(item => item.id)
-        return this.$array.hasCommonElement(userRoles, externalRoles) || !userRoles.length
-      })
+        let userRoles = user.roles.map(item => item.id);
+        return this.$array.hasCommonElement(userRoles, externalRoles) || !userRoles.length;
+      });
       //Response
       return {
         title: externalUsers.map(user => user.id).includes(userId) ? siteName :
-          externalUsers.map(user => user.fullName).join(', '),
+          (externalUsers.length ? externalUsers : conversation.users).map(user => user.fullName).join(', '),
         externalUsers
-      }
+      };
 
     },
     showError({ roomId, message }) {
@@ -850,28 +854,28 @@ export default {
                 roomId: roomId,
                 body: message.content,
                 attached: message.files[0]?.id
-              }
+              };
 
               // Delete failed Message
               this.conversationMessages = this.conversationMessages.filter(item => item.id !== message._id);
               // Push resend Message
-              this.pushMessage(messageParsed)
+              this.pushMessage(messageParsed);
 
               this.uploadMessage(messageParsed).then(response => {
-                this.$crud.delete('apiRoutes.qchat.messages', message._id)
-              })
+                this.$crud.delete('apiRoutes.qchat.messages', message._id);
+              });
             }
           }
         ]
       });
-    },
+    }
   }
-}
+};
 </script>
 <style lang="scss">
 #advanceChatComponentContent {
   #vueAdvanceChat {
-    &.vac-card-window  {
+    &.vac-card-window {
       box-shadow: none;
     }
 
