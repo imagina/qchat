@@ -57,7 +57,8 @@
         </div>
         <!--Chat component-->
         <div class="col">
-          <vue-advanced-chat
+          <!--working-->
+          <!--<vue-advanced-chat
             :rooms="rooms" 
             :messages="messages"
             :room-id="openRoomId"
@@ -72,15 +73,17 @@
             @fetch-messages="getMessages($event.detail[0])"
             @fetch-more-rooms="getRooms($event.detail[0])" @open-failed-message="showError"
           />
-          <!--vue-advanced-chat
-            :rooms="rooms"
-            :room-id="openRoomId"
-            :rooms-loaded="true"
-            :messages-loaded="true"
-            :single-room="true"
-            :current-user-id="this.$store.state.quserAuth.userId"
-            :load-first-room="false"            
-          />-->          
+          -->
+
+          <vue-advanced-chat
+            v-bind="chatProps"
+            @send-message="sendMessage($event.detail[0])"
+            @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
+            @open-file="({ message }) => $helper.openExternalURL(message.files[0].url, true)"
+            @fetch-messages="getMessages($event.detail[0])"
+            @fetch-more-rooms="getRooms($event.detail[0])" @open-failed-message="showError"
+          />
+          
         </div>
       </div>
       <!--Dialog to new room-->
@@ -176,10 +179,7 @@ export default {
         page: 0,
         perPage: 20,
         total: 0
-      }, 
-      messagesLoaded: false,
-      loadComponent: true,
-      rooms: []
+      },
     };
   },
   computed: {
@@ -200,16 +200,16 @@ export default {
     chatProps() {
       let response = {
         'current-user-id': this.$store.state.quserAuth.userId,
-        //rooms: this.rooms,
-        //messages: this.messages,
+        rooms: this.rooms,
+        messages: this.messages,
         'loading-rooms': this.loading.rooms,
         'rooms-loaded': true,
         'show-reaction-emojis': false,
-        //'messages-loaded': (this.chatPagination.page == this.chatPagination.lastPage) ? true : false,
+        'messages-loaded': (this.chatPagination.page == this.chatPagination.lastPage) ? true : false,
         'load-first-room': false,
         'single-room': true,//this.roomId ? true : false,
         'show-add-room': this.allowCreateChat,
-        //'room-id': this.openRoomId,
+        'room-id': this.openRoomId,
         'message-actions': JSON.stringify([{ name: 'replyMessage', title: 'Reply' }]),
         'accepted-files': this.acceptFiles,
         height: this.height,
@@ -596,8 +596,6 @@ export default {
           this.chatPagination.page = response.meta.page.currentPage;
           //Hide loading
           this.loading.messages = false;
-          this.messagesLoaded = true          
-          console.log('loaded MSG')
           resolve(response.data);
         }).catch(error => {
           this.$apiResponse.handleError(error, () => {
