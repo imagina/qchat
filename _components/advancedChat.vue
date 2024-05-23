@@ -3,7 +3,8 @@
     <div id="advanceChatComponentContent" class="relative-position">
       <div class="row">
         <!-- Rooms List -->
-        <div v-if="false" style="width: 300px">
+        openRoomId {{ openRoomId }}
+        <div style="width: 300px">
           <!-- Header -->
           <div class="row q-pa-sm justify-between">
             <!--Search-->
@@ -28,7 +29,7 @@
                 </q-item-section>
                 <q-item-section>
                   <q-item-label class="text-body2 text-blue-grey text-weight-bold" lines="1">
-                    {{ chat.roomName }}
+                   # {{chat.roomId}} {{ chat.roomName }}
                   </q-item-label>
                   <q-item-label caption v-if="chat.phone" class="text-blue-grey">
                     <q-icon name="fa-light fa-phone" class="q-mr-xs" />
@@ -56,11 +57,30 @@
         </div>
         <!--Chat component-->
         <div class="col">
-          <vue-advanced-chat id="vueAdvanceChat" v-bind="chatProps" @send-message="sendMessage($event.detail[0])"
-                             @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
-                             @open-file="({ message }) => $helper.openExternalURL(message.files[0].url, true)"
-                             @fetch-messages="getMessages($event.detail[0])"
-                             @fetch-more-rooms="getRooms($event.detail[0])" @open-failed-message="showError" />
+          <vue-advanced-chat
+            :rooms="rooms" 
+            :messages="messages"
+            :room-id="openRoomId"
+            :rooms-loaded="true"
+            :messages-loaded="true"
+            :single-room="true"
+            :current-user-id="this.$store.state.quserAuth.userId"
+            :load-first-room="false"
+            @send-message="sendMessage($event.detail[0])"
+            @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
+            @open-file="({ message }) => $helper.openExternalURL(message.files[0].url, true)"
+            @fetch-messages="getMessages($event.detail[0])"
+            @fetch-more-rooms="getRooms($event.detail[0])" @open-failed-message="showError"
+          />
+          <!--vue-advanced-chat
+            :rooms="rooms"
+            :room-id="openRoomId"
+            :rooms-loaded="true"
+            :messages-loaded="true"
+            :single-room="true"
+            :current-user-id="this.$store.state.quserAuth.userId"
+            :load-first-room="false"            
+          />-->          
         </div>
       </div>
       <!--Dialog to new room-->
@@ -156,7 +176,10 @@ export default {
         page: 0,
         perPage: 20,
         total: 0
-      }
+      }, 
+      messagesLoaded: false,
+      loadComponent: true,
+      rooms: []
     };
   },
   computed: {
@@ -177,16 +200,16 @@ export default {
     chatProps() {
       let response = {
         'current-user-id': this.$store.state.quserAuth.userId,
-        rooms: this.rooms,
-        messages: this.messages,
+        //rooms: this.rooms,
+        //messages: this.messages,
         'loading-rooms': this.loading.rooms,
         'rooms-loaded': true,
         'show-reaction-emojis': false,
-        'messages-loaded': (this.chatPagination.page == this.chatPagination.lastPage) ? true : false,
+        //'messages-loaded': (this.chatPagination.page == this.chatPagination.lastPage) ? true : false,
         'load-first-room': false,
-        // 'single-room': true,//this.roomId ? true : false,
+        'single-room': true,//this.roomId ? true : false,
         'show-add-room': this.allowCreateChat,
-        'room-id': this.openRoomId,
+        //'room-id': this.openRoomId,
         'message-actions': JSON.stringify([{ name: 'replyMessage', title: 'Reply' }]),
         'accepted-files': this.acceptFiles,
         height: this.height,
@@ -215,7 +238,7 @@ export default {
 
         //Instance roorm
         let room = {
-          roomId: conversation.id,
+          roomId: conversation.id.toString(),
           roomName: this.conversationExternalData(conversation).title,
           avatar: roomImage,
           unreadCount: conversation.unreadMessagesCount || false,
@@ -358,7 +381,7 @@ export default {
                 loadOptions: {
                   apiRoute: 'apiRoutes.quser.users',
                   select: { label: 'fullName', id: 'id' },
-                  filterByQuery: true
+                  //filterByQuery: true
                 }
               }
             }
@@ -467,6 +490,7 @@ export default {
               this.orderConversationData([response.data]);
               this.openRoomId = this.conversations[0].id;
               this.loading.rooms = false; // stop load Rooms
+              
               resolve(response.data);
             }).catch(error => {
               this.$apiResponse.handleError(error, () => {
@@ -536,7 +560,7 @@ export default {
       this.conversations = conversations;
     },
     //Get messages
-    getMessages({ room, options }) {
+    getMessages({ options }) {
       return new Promise((resolve, reject) => {
         this.loading.messages = true;
         //Reset room data
@@ -546,10 +570,10 @@ export default {
           this.chatPagination.lastPage = -1;//Reset chat plast page
         }
         //Order room data after open
-        let roomId = room?.roomId ?? this.openRoomId;//Set open room id
+        let roomId = this.openRoomId;//Set open room id
         //Reset unread message to conversation
         let conversationIndex = this.conversations.findIndex(item => item.id == roomId);
-        this.conversations[conversationIndex].unreadMessagesCount = false;
+        //this.conversations[conversationIndex].unreadMessagesCount = false;
         //Request params
         let requestParams = {
           refresh: true,
@@ -572,6 +596,8 @@ export default {
           this.chatPagination.page = response.meta.page.currentPage;
           //Hide loading
           this.loading.messages = false;
+          this.messagesLoaded = true          
+          console.log('loaded MSG')
           resolve(response.data);
         }).catch(error => {
           this.$apiResponse.handleError(error, () => {
@@ -868,7 +894,7 @@ export default {
           }
         ]
       });
-    }
+    },
   }
 };
 </script>
