@@ -32,7 +32,7 @@
                 </q-item-section>
                 <q-item-section>
                   <q-item-label class="text-body2 text-blue-grey text-weight-bold" lines="1">
-                   {{chat.roomId}} {{ chat.roomName }}
+                   {{ chat.roomName }}
                   </q-item-label>
                   <q-item-label caption v-if="chat.phone" class="text-blue-grey">
                     <q-icon name="fa-light fa-phone" class="q-mr-xs" />
@@ -61,8 +61,6 @@
         </div>
         <!--Chat component-->
         <div class="col">
-          <!--working-->
-          openRoomId : {{ openRoomId }}
           <vue-advanced-chat
             :room-id="openRoomId"
             :rooms="rooms"
@@ -85,11 +83,7 @@
             @open-file="({ message }) => $helper.openExternalURL(message.files[0].url, true)"
             @fetch-messages="getMessages($event.detail[0])"
             @fetch-more-rooms="getRooms($event.detail[0])" @open-failed-message="showError"
-          />          
-          <q-btn 
-            label="room 2" 
-            @click="openRoomId = '2'"
-          />          
+          />
         </div>
       </div>
       <!--Dialog to new room-->
@@ -185,7 +179,7 @@ export default {
         page: 0,
         perPage: 20,
         total: 0
-      },
+      }
     };
   },
   computed: {
@@ -209,7 +203,7 @@ export default {
         'loading-rooms': this.loading.rooms,
         'rooms-loaded': true,
         'show-reaction-emojis': false,
-        'messages-loaded': true, //(this.chatPagination.page == this.chatPagination.lastPage)
+        'messages-loaded': (this.chatPagination.page == this.chatPagination.lastPage) ? true : false,
         'load-first-room': false,
         'single-room': true,//this.roomId ? true : false,
         'show-add-room': this.allowCreateChat,        
@@ -384,7 +378,7 @@ export default {
                 loadOptions: {
                   apiRoute: 'apiRoutes.quser.users',
                   select: { label: 'fullName', id: 'id' },
-                  //filterByQuery: true
+                  filterByQuery: true
                 }
               }
             }
