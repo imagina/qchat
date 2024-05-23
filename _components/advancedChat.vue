@@ -22,7 +22,11 @@
             <q-infinite-scroll @load="(index, done) => getRooms({ index, done })" :offset="50"
                                :scroll-target="$refs.listRoomsContent" ref="infiniteScroll" debounce="300">
               <template v-for="(chat, index) in rooms" :key="index" >
-              <q-item class="q-pl-sm" clickable @click="openRoomId= chat.roomId">
+              <q-item 
+                class="q-pl-sm" 
+                clickable @click="openRoomId= chat.roomId" 
+                :focused="openRoomId == chat.roomId"
+              >
                 <q-item-section top avatar class="q-pr-sm" style="min-width: 48px; max-width: 48px">
                   <q-avatar><img :src="chat.avatar"></q-avatar>
                 </q-item-section>
@@ -64,9 +68,8 @@
             :rooms="rooms"
             :messages="messages"
             :height="chatProps['height']"
-            :current-user-id="chatProps['current-user-id']"            
-            :loading-rooms="chatProps['loading-rooms']"
-            :rooms-loaded="chatProps['rooms-loaded']"            
+            :current-user-id="chatProps['current-user-id']"
+            :rooms-loaded="true"
             :load-first-room="chatProps['load-first-room']"            
             :username-options="chatProps['username-options']"
             :menu-actions="chatProps['menu-actions']"
@@ -573,7 +576,7 @@ export default {
         let roomId = this.openRoomId;//Set open room id
         //Reset unread message to conversation
         let conversationIndex = this.conversations.findIndex(item => item.id == roomId);
-        //this.conversations[conversationIndex].unreadMessagesCount = false;
+        this.conversations[conversationIndex].unreadMessagesCount = false;
         //Request params
         let requestParams = {
           refresh: true,
