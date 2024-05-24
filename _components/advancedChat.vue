@@ -3,7 +3,7 @@
     <div id="advanceChatComponentContent" class="relative-position">
       <div class="row">
         <!-- Rooms List -->
-        <div v-if="false" style="width: 300px">
+        <div style="width: 300px">
           <!-- Header -->
           <div class="row q-pa-sm justify-between">
             <!--Search-->
@@ -21,14 +21,18 @@
             </div>
             <q-infinite-scroll @load="(index, done) => getRooms({ index, done })" :offset="50"
                                :scroll-target="$refs.listRoomsContent" ref="infiniteScroll" debounce="300">
-              <q-item v-for="(chat, index) in rooms" :key="index" class="q-pl-sm" clickable
-                      @click="openRoomId = chat.roomId">
+              <template v-for="(chat, index) in rooms" :key="index" >
+              <q-item 
+                class="q-pl-sm" 
+                clickable @click="openRoomId= chat.roomId" 
+                :focused="openRoomId == chat.roomId"
+              >
                 <q-item-section top avatar class="q-pr-sm" style="min-width: 48px; max-width: 48px">
                   <q-avatar><img :src="chat.avatar"></q-avatar>
                 </q-item-section>
                 <q-item-section>
                   <q-item-label class="text-body2 text-blue-grey text-weight-bold" lines="1">
-                    {{ chat.roomName }}
+                   {{ chat.roomName }}
                   </q-item-label>
                   <q-item-label caption v-if="chat.phone" class="text-blue-grey">
                     <q-icon name="fa-light fa-phone" class="q-mr-xs" />
@@ -46,6 +50,7 @@
                            :label="chat.unreadCount" />
                 </q-item-section>
               </q-item>
+              </template>
               <template v-slot:loading>
                 <div class="row justify-center q-my-md">
                   <q-spinner-dots color="primary" size="40px" />
@@ -56,11 +61,29 @@
         </div>
         <!--Chat component-->
         <div class="col">
-          <vue-advanced-chat id="vueAdvanceChat" v-bind="chatProps" @send-message="sendMessage($event.detail[0])"
-                             @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
-                             @open-file="({ message }) => $helper.openExternalURL(message.files[0].url, true)"
-                             @fetch-messages="getMessages($event.detail[0])"
-                             @fetch-more-rooms="getRooms($event.detail[0])" @open-failed-message="showError" />
+          <vue-advanced-chat
+            :room-id="openRoomId"
+            :rooms="rooms"
+            :messages="messages"
+            :height="chatProps['height']"
+            :current-user-id="chatProps['current-user-id']"
+            :rooms-loaded="true"
+            :load-first-room="chatProps['load-first-room']"            
+            :username-options="chatProps['username-options']"
+            :menu-actions="chatProps['menu-actions']"
+            :messages-loaded="chatProps['messages-loaded']"            
+            :message-actions="chatProps['message-actions']"
+            :show-add-room="chatProps['show-add-room']"
+            :show-reaction-emojis="chatProps['show-reaction-emojis']"
+            :scroll-distance="chatProps['scroll-distance']"
+            :single-room="chatProps['single-room']"
+            :accepted-files="chatProps['accepted-files']"
+            @send-message="sendMessage($event.detail[0])"
+            @add-room="modalNewRoom.show = true" @menu-action-handler="menuActionHandler"
+            @open-file="({ message }) => $helper.openExternalURL(message.files[0].url, true)"
+            @fetch-messages="getMessages($event.detail[0])"
+            @fetch-more-rooms="getRooms($event.detail[0])" @open-failed-message="showError"
+          />
         </div>
       </div>
       <!--Dialog to new room-->
@@ -176,20 +199,17 @@ export default {
     //Chat props
     chatProps() {
       let response = {
-        'current-user-id': this.$store.state.quserAuth.userId,
-        rooms: this.rooms,
-        messages: this.messages,
+        'current-user-id': this.$store.state.quserAuth.userId,        
         'loading-rooms': this.loading.rooms,
         'rooms-loaded': true,
         'show-reaction-emojis': false,
         'messages-loaded': (this.chatPagination.page == this.chatPagination.lastPage) ? true : false,
         'load-first-room': false,
-        // 'single-room': true,//this.roomId ? true : false,
-        'show-add-room': this.allowCreateChat,
-        'room-id': this.openRoomId,
+        'single-room': true,//this.roomId ? true : false,
+        'show-add-room': this.allowCreateChat,        
         'message-actions': JSON.stringify([{ name: 'replyMessage', title: 'Reply' }]),
         'accepted-files': this.acceptFiles,
-        height: this.height,
+        'height': this.height,
         'menu-actions': [],
         'username-options': JSON.stringify({ minUsers: 1, currentUser: false }),
         'scroll-distance': 10,
@@ -215,7 +235,7 @@ export default {
 
         //Instance roorm
         let room = {
-          roomId: conversation.id,
+          roomId: conversation.id.toString(),
           roomName: this.conversationExternalData(conversation).title,
           avatar: roomImage,
           unreadCount: conversation.unreadMessagesCount || false,
@@ -467,6 +487,7 @@ export default {
               this.orderConversationData([response.data]);
               this.openRoomId = this.conversations[0].id;
               this.loading.rooms = false; // stop load Rooms
+              
               resolve(response.data);
             }).catch(error => {
               this.$apiResponse.handleError(error, () => {
@@ -536,7 +557,7 @@ export default {
       this.conversations = conversations;
     },
     //Get messages
-    getMessages({ room, options }) {
+    getMessages({ options }) {
       return new Promise((resolve, reject) => {
         this.loading.messages = true;
         //Reset room data
@@ -546,7 +567,7 @@ export default {
           this.chatPagination.lastPage = -1;//Reset chat plast page
         }
         //Order room data after open
-        let roomId = room?.roomId ?? this.openRoomId;//Set open room id
+        let roomId = this.openRoomId;//Set open room id
         //Reset unread message to conversation
         let conversationIndex = this.conversations.findIndex(item => item.id == roomId);
         this.conversations[conversationIndex].unreadMessagesCount = false;
@@ -868,7 +889,7 @@ export default {
           }
         ]
       });
-    }
+    },    
   }
 };
 </script>
