@@ -22,9 +22,9 @@
             <q-infinite-scroll @load="(index, done) => getRooms({ index, done })" :offset="50"
                                :scroll-target="$refs.listRoomsContent" ref="infiniteScroll" debounce="300">
               <template v-for="(chat, index) in rooms" :key="index" >
-              <q-item 
-                class="q-pl-sm" 
-                clickable @click="openRoomId= chat.roomId" 
+              <q-item
+                class="q-pl-sm"
+                clickable @click="openRoomId= chat.roomId"
                 :focused="openRoomId == chat.roomId"
               >
                 <q-item-section top avatar class="q-pr-sm" style="min-width: 48px; max-width: 48px">
@@ -68,10 +68,10 @@
             :height="chatProps['height']"
             :current-user-id="chatProps['current-user-id']"
             :rooms-loaded="true"
-            :load-first-room="chatProps['load-first-room']"            
+            :load-first-room="chatProps['load-first-room']"
             :username-options="chatProps['username-options']"
             :menu-actions="chatProps['menu-actions']"
-            :messages-loaded="chatProps['messages-loaded']"            
+            :messages-loaded="chatProps['messages-loaded']"
             :message-actions="chatProps['message-actions']"
             :show-add-room="chatProps['show-add-room']"
             :show-reaction-emojis="chatProps['show-reaction-emojis']"
@@ -199,14 +199,14 @@ export default {
     //Chat props
     chatProps() {
       let response = {
-        'current-user-id': this.$store.state.quserAuth.userId,        
+        'current-user-id': this.$store.state.quserAuth.userId,
         'loading-rooms': this.loading.rooms,
         'rooms-loaded': true,
         'show-reaction-emojis': false,
         'messages-loaded': (this.chatPagination.page == this.chatPagination.lastPage) ? true : false,
         'load-first-room': false,
         'single-room': true,//this.roomId ? true : false,
-        'show-add-room': this.allowCreateChat,        
+        'show-add-room': this.allowCreateChat,
         'message-actions': JSON.stringify([{ name: 'replyMessage', title: 'Reply' }]),
         'accepted-files': this.acceptFiles,
         'height': this.height,
@@ -268,12 +268,14 @@ export default {
     messages() {
       let messages = [];//Response
       let conversationMessages = this.$clone(this.conversationMessages).reverse();
+      let conversation = conversationMessages.length ? this.conversations.find(item => item.id == conversationMessages[0].conversationId) : null
+      let externalUserIds = conversation ? this.conversationExternalData(conversation).externalUsers.map(item => item.id) : []
+      let conversationType = externalUserIds.includes(this.$store.state.quserAuth.userId) ? 'external' : 'internal'
       //Order room
       conversationMessages.forEach(messageData => {
         if (!messages.find(message => message._id == messageData.id)) {
-          let conversation = this.conversations.find(item => item.id == messageData.conversationId);
-          let rightMessage = !conversation ? false :
-            (this.conversationExternalData(conversation).externalUsers.map(item => item.id).includes(messageData.user.id) ? false : true);
+          let userConversationType = externalUserIds.includes(messageData.user.id) ? 'external' : 'internal'
+          let rightMessage = !conversation ? false : (userConversationType == conversationType)
           //Validate reply message
           if (messageData.replyTo) {
             messageData.replyMessage = {
@@ -468,7 +470,7 @@ export default {
     getRooms(params = {}) {
       return new Promise((resolve, reject) => {
         if (this.loadRooms) {
-          params = { index: 1, done: null, search: null, roomId: null, ...params };
+          params = { index: 1, done: null, search: null, roomId: this.roomsId, ...params };
           this.loading.rooms = true;
           if (!this.rooms.map(item => item.roomId).includes(this.openRoomId)) this.openRoomId = null;
 
@@ -482,12 +484,12 @@ export default {
           };
 
           //Request
-          if (this.roomId) {//Get only one room
-            this.$crud.show('apiRoutes.qchat.conversations', this.roomId, requestParams).then(response => {
+          if (params.roomId) {//Get only one room
+            this.$crud.show('apiRoutes.qchat.conversations', params.roomId, requestParams).then(response => {
               this.orderConversationData([response.data]);
               this.openRoomId = this.conversations[0].id;
               this.loading.rooms = false; // stop load Rooms
-              
+
               resolve(response.data);
             }).catch(error => {
               this.$apiResponse.handleError(error, () => {
@@ -515,6 +517,7 @@ export default {
                 this.roomsPagination.total = response.meta.page.total;
                 this.roomsPagination.page = response.meta.page.currentPage;
                 this.loading.rooms = false;
+                this.openRoomFromUrl()
                 resolve(response.data);
                 if (params.done) params.done();
               }).catch(error => {
@@ -889,7 +892,19 @@ export default {
           }
         ]
       });
-    },    
+    },
+    //Open room from URL
+    openRoomFromUrl() {
+      setTimeout(() => {
+        let conversationId = this.$route.query.conversationId
+        if (conversationId) {
+          let conversationInList = this.conversations.find(item => item.id == conversationId)
+          //Open or get conversation
+          if (conversationInList) this.openRoomId = conversationInList.id
+          else this.getRooms({roomId: conversationId})
+        }
+      }, 200)
+    }
   }
 };
 </script>
