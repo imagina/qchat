@@ -274,12 +274,15 @@ export default {
     messages() {
       let messages = []//Response
       let conversationMessages = this.$clone(this.conversationMessages).reverse()
+      let conversation = conversationMessages.length ? this.conversations.find(item => item.id == conversationMessages[0].conversationId) : null
+      let externalUserIds = conversation ? this.conversationExternalData(conversation).externalUsers.map(item => item.id) : []
+      let conversationType = externalUserIds.includes(this.$store.state.quserAuth.userId) ? 'external' : 'internal'
       //Order room
       conversationMessages.forEach(messageData => {
         if (!messages.find(message => message._id == messageData.id)) {
-          let conversation = this.conversations.find(item => item.id == messageData.conversationId)
-          let rightMessage = !conversation ? false :
-              (this.conversationExternalData(conversation).externalUsers.map(item => item.id).includes(messageData.user.id) ? false : true)
+          let userConversationType = externalUserIds.includes(messageData.user.id) ? 'external' : 'internal'
+          let rightMessage = !conversation ? false : (userConversationType == conversationType)
+
           //Validate reply message
           if (messageData.replyTo) {
             messageData.replyMessage = {
@@ -323,7 +326,6 @@ export default {
 
             //Push room
             messages.push(systemMessage)
-
           }
 
           // Defined text of status
@@ -480,7 +482,7 @@ export default {
     getRooms: debounce(function (params = {}) {
       return new Promise((resolve, reject) => {
         if (this.loadRooms) {
-          params = {index: 1, done: null, search: null, roomId: null, ...params}
+          params = {index: 1, done: null, search: null, roomId: this.roomId, ...params}
           this.loading.general = true
           if (!this.rooms.map(item => item.roomId).includes(this.openRoomId)) this.openRoomId = null
 
@@ -494,8 +496,8 @@ export default {
           }
 
           //Request
-          if (this.roomId) {//Get only one room
-            this.$crud.show('apiRoutes.qchat.conversations', this.roomId, requestParams).then(response => {
+          if (params.roomId) {//Get only one room
+            this.$crud.show('apiRoutes.qchat.conversations', params.roomId, requestParams).then(response => {
               this.orderConversationData([response.data])
               this.openRoomId = this.conversations[0].id
               this.loading.general = false // stop load Rooms
@@ -529,6 +531,7 @@ export default {
                 if (params.done) params.done()
                 if (response.meta.page.currentPage == response.meta.page.lastPage) this.$refs.infiniteScroll.stop()
                 this.openSiteConversation()
+                this.openRoomFromUrl()
                 resolve(response.data)
               }).catch(error => {
                 this.$apiResponse.handleError(error, () => {
@@ -928,6 +931,18 @@ export default {
         ]
       });
     },
+    //Open room from URL
+    openRoomFromUrl() {
+      setTimeout(() => {
+        let conversationId = this.$route.query.conversationId
+        if (conversationId) {
+          let conversationInList = this.conversations.find(item => item.id == conversationId)
+          //Open or get conversation
+          if (conversationInList) this.openRoomId = conversationInList.id
+          else this.getRooms({roomId: conversationId})
+        }
+      }, 200)
+    }
   }
 }
 </script>
