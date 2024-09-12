@@ -213,6 +213,8 @@ export default {
         showAddRoom: this.allowCreateChat,
         messageActions: [{name: 'replyMessage', title: 'Reply'}],
         acceptedFiles: this.acceptFiles,
+        showFiles: false,//TODO: Disable for issues with tenancy
+        showAudio: false,//TODO: Disable for issues with tenancy
         height: this.height,
         menuActions: [],
         userOptions: {minUsers: 1, currentUser: false},
@@ -616,7 +618,7 @@ export default {
           params: {
             page: (this.chatPagination.page + 1),
             take: this.chatPagination.perPage,
-            filter: {conversationId: room.roomId},
+            filter: {conversationId: room.roomId, withoutTenancy: true},
             include: 'user,replyTo'
           }
         }
