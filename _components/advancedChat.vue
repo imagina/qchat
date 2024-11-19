@@ -887,16 +887,24 @@ export default {
     conversationExternalData(conversation) {
       let externalRoles = this.$store.getters['qsiteApp/getSettingValueByName']('ichat::externalRoles') ?? []
       let siteName = conversation.organization?.title || this.$store.getters['qsiteApp/getSettingValueByName']('core::site-name')
-      let userId = this.$store.state.quserAuth.userId
+      let userData = this.$store.state.quserAuth.userData
       //Group the users
       let externalUsers = conversation.users.filter(user => {
         let userRoles = user.roles.map(item => item.id)
         return this.$array.hasCommonElement(userRoles, externalRoles) || !userRoles.length
       })
 
+      if (conversation.private) {
+        if (conversation.entityType == 'Modules\\User\\Entities\\Sentinel\\User' && conversation.entityId == userData.id) {
+          externalUsers = [userData];
+        } else {
+          externalUsers = conversation.users.filter(user => user.id != userData.id);
+        }
+      }
+
       //Response
       return {
-        title: externalUsers.map(user => user.id).includes(userId) ? siteName :
+        title: externalUsers.map(user => user.id).includes(userData.id) ? siteName :
             externalUsers.map(user => user.fullName).join(', '),
         externalUsers
       }
