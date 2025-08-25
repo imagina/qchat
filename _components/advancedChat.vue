@@ -854,9 +854,9 @@ export default {
         let userRoles = user.roles.map(item => item.id);
         return this.$array.hasCommonElement(userRoles, externalRoles) || !userRoles.length;
       });
-      
+
       if (conversation.private) {
-        if (conversation.entityType == 'Modules\\User\\Entities\\Sentinel\\User' && conversation.entityId == userData.id) {
+        if (conversation.entityType == 'Modules\\User\\Models\\Sentinel\\User' && conversation.entityId == userData.id) {
           externalUsers = [userData];
         } else {
           externalUsers = conversation.users.filter(user => user.id != userData.id);
